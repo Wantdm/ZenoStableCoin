@@ -1,17 +1,18 @@
-import { Card, Pill, LiveDot, Button, Avatar, MethodBadge } from '../components/UI'
-import { treasury, team, recentActivity } from '../data'
+import { Card, Pill, LiveDot, Button, Avatar, MethodBadge, CountUpNumber } from '../components/UI'
+import { treasury, recentActivity } from '../data'
 import { IconTrendUp, IconArrowRight, IconBolt } from '../components/Icons'
-import type { View } from '../App'
+import { useApp } from '../context/AppContext'
 
-export function Dashboard({ setView }: { setView: (v: View) => void }) {
+export function Dashboard() {
+  const { team, setView, goToPayroll } = useApp()
   const monthly = team.reduce((s, m) => s + m.amount, 0)
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-border-subtle px-8 py-4">
+      <div className="flex items-center justify-between border-b border-border-subtle px-8 py-4 pr-40">
         <h1 className="text-[18px] font-semibold">Dashboard</h1>
         <div className="flex items-center gap-3">
           <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
-          <Button variant="primary" onClick={() => setView('payroll')}>
+          <Button variant="primary" onClick={goToPayroll}>
             <IconBolt width={14} height={14} /> Run payroll
           </Button>
         </div>
@@ -19,10 +20,10 @@ export function Dashboard({ setView }: { setView: (v: View) => void }) {
 
       <div className="flex-1 overflow-auto px-8 py-7">
         <div className="grid grid-cols-4 gap-4">
-          <Stat label="Treasury balance" value={`$${treasury.balance.toLocaleString()}`} sub={`+$${treasury.yieldMtd.toLocaleString()} MTD`} subTone="green" />
-          <Stat label="Yield (APY)" value={`${treasury.apy}%`} sub="Auto-compounded" />
-          <Stat label="Monthly payroll" value={`$${monthly.toLocaleString()}`} sub={`${team.length} contractors`} />
-          <Stat label="Avg settlement" value="< 3 min" sub="0.2% fee" subTone="green" />
+          <Stat label="Treasury balance" valueEl={<>$<CountUpNumber target={treasury.balance} /></>} sub={`+$${treasury.yieldMtd.toLocaleString()} MTD`} subTone="green" />
+          <Stat label="Yield (APY)" valueEl={<><CountUpNumber target={treasury.apy} decimals={1} durationMs={900} />%</>} sub="Auto-compounded" />
+          <Stat label="Monthly payroll" valueEl={<>$<CountUpNumber target={monthly} /></>} sub={`${team.length} contractor${team.length === 1 ? '' : 's'}`} />
+          <Stat label="Avg settlement" valueEl={<>&lt; 3 min</>} sub="0.2% fee" subTone="green" />
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-4">
@@ -39,14 +40,14 @@ export function Dashboard({ setView }: { setView: (v: View) => void }) {
 
           <Card className="p-6">
             <div className="text-[14.5px] font-semibold">Next payroll</div>
-            <div className="mt-2 font-mono text-[28px] font-semibold tabular-nums">${monthly.toLocaleString()}</div>
+            <div className="mt-2 font-mono text-[28px] font-semibold tabular-nums">$<CountUpNumber target={monthly} /></div>
             <div className="text-[12.5px] text-text-secondary">Scheduled · April 30</div>
             <div className="mt-5 flex -space-x-2">
               {team.map((m) => (
                 <div key={m.id} className="ring-2 ring-bg-surface rounded-full"><Avatar initials={m.initials} color={m.avatarColor} size={28} /></div>
               ))}
             </div>
-            <Button variant="secondary" className="mt-5 w-full" onClick={() => setView('payroll')}>
+            <Button variant="secondary" className="mt-5 w-full" onClick={goToPayroll}>
               Review payroll <IconArrowRight width={14} height={14} />
             </Button>
           </Card>
@@ -64,7 +65,7 @@ export function Dashboard({ setView }: { setView: (v: View) => void }) {
                   <div className="flex items-center gap-3">
                     <Avatar initials={m.initials} color={m.avatarColor} size={32} />
                     <div>
-                      <div className="text-[13.5px] font-medium">{m.name}</div>
+                      <div className="text-[13.5px] font-medium">{m.name || 'Unnamed'}</div>
                       <div className="text-[12px] text-text-muted">{m.role}</div>
                     </div>
                   </div>
@@ -100,11 +101,11 @@ export function Dashboard({ setView }: { setView: (v: View) => void }) {
   )
 }
 
-function Stat({ label, value, sub, subTone = 'muted' }: { label: string; value: string; sub: string; subTone?: 'muted' | 'green' }) {
+function Stat({ label, valueEl, sub, subTone = 'muted' }: { label: string; valueEl: React.ReactNode; sub: string; subTone?: 'muted' | 'green' }) {
   return (
     <Card className="p-5">
       <div className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted">{label}</div>
-      <div className="mt-2 font-mono text-[22px] font-semibold tabular-nums tracking-tight">{value}</div>
+      <div className="mt-2 font-mono text-[22px] font-semibold tabular-nums tracking-tight">{valueEl}</div>
       <div className={`mt-1 text-[12px] ${subTone === 'green' ? 'text-brand-400' : 'text-text-muted'}`}>{sub}</div>
     </Card>
   )

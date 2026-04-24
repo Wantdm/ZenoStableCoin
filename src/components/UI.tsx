@@ -1,4 +1,6 @@
 import { ReactNode } from 'react'
+import { motion } from 'framer-motion'
+import { useCountUp, useInView } from '../hooks/useCountUp'
 
 export function Pill({
   children,
@@ -6,7 +8,7 @@ export function Pill({
   className = '',
 }: {
   children: ReactNode
-  tone?: 'neutral' | 'green' | 'blue' | 'purple'
+  tone?: 'neutral' | 'green' | 'blue' | 'purple' | 'amber'
   className?: string
 }) {
   const tones: Record<string, string> = {
@@ -14,6 +16,7 @@ export function Pill({
     green: 'bg-brand-500/15 text-brand-400',
     blue: 'bg-info-500/15 text-info-500',
     purple: 'bg-violet-500/15 text-violet-400',
+    amber: 'bg-amber-500/15 text-amber-400',
   }
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-medium ${tones[tone]} ${className}`}>
@@ -23,7 +26,16 @@ export function Pill({
 }
 
 export function LiveDot() {
-  return <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-60" /><span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" /></span>
+  return (
+    <span className="relative flex h-2 w-2">
+      <motion.span
+        className="absolute inline-flex h-full w-full rounded-full bg-brand-500"
+        animate={{ opacity: [0.55, 1, 0.55], scale: [1, 1.15, 1] }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
+    </span>
+  )
 }
 
 export function Button({
@@ -34,14 +46,16 @@ export function Button({
   type = 'button',
   className = '',
   disabled,
+  title,
 }: {
   children: ReactNode
-  variant?: 'primary' | 'secondary' | 'ghost'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
   size?: 'md' | 'sm' | 'lg'
   onClick?: () => void
   type?: 'button' | 'submit'
   className?: string
   disabled?: boolean
+  title?: string
 }) {
   const sizes = {
     sm: 'h-8 px-3 text-[12.5px]',
@@ -49,16 +63,18 @@ export function Button({
     lg: 'h-11 px-5 text-[14px]',
   }
   const variants = {
-    primary: 'bg-brand-500 text-bg-base hover:bg-brand-400 font-medium',
-    secondary: 'bg-white/[0.04] text-text-primary border border-border-subtle hover:bg-white/[0.07]',
-    ghost: 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]',
+    primary: 'bg-brand-500 text-bg-base hover:bg-brand-400 active:bg-brand-600 font-medium focus:ring-brand-500/50',
+    secondary: 'bg-white/[0.04] text-text-primary border border-border-subtle hover:bg-white/[0.08] hover:border-border active:bg-white/[0.05] focus:ring-white/30',
+    ghost: 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04] focus:ring-white/20',
+    danger: 'bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 focus:ring-rose-500/40',
   }
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:pointer-events-none ${sizes[size]} ${variants[variant]} ${className}`}
+      title={title}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 disabled:opacity-50 disabled:pointer-events-none active:translate-y-[0.5px] ${sizes[size]} ${variants[variant]} ${className}`}
     >
       {children}
     </button>
@@ -94,4 +110,34 @@ export function CountryBadge({ code, name }: { code: string; name: string }) {
 export function MethodBadge({ method }: { method: 'USDC' | 'USDT' | 'EUR Bank' }) {
   if (method === 'EUR Bank') return <Pill tone="blue">EUR Bank</Pill>
   return <Pill tone="green">{method}</Pill>
+}
+
+export function CountUpNumber({
+  target,
+  prefix = '',
+  suffix = '',
+  decimals = 0,
+  className = '',
+  durationMs = 1400,
+  when = 'mount',
+}: {
+  target: number
+  prefix?: string
+  suffix?: string
+  decimals?: number
+  className?: string
+  durationMs?: number
+  when?: 'mount' | 'inView'
+}) {
+  const { ref, inView } = useInView<HTMLSpanElement>({ threshold: 0.3 })
+  const start = when === 'mount' ? true : inView
+  const value = useCountUp(target, { durationMs, start, decimals })
+  const formatted = value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+  return (
+    <span ref={ref} className={className}>
+      {prefix}
+      {formatted}
+      {suffix}
+    </span>
+  )
 }

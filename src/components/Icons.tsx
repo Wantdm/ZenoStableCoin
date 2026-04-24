@@ -53,3 +53,21 @@ export const IconShield = (p: SVGProps<SVGSVGElement>) => (
 export const IconTrendUp = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base} {...p}><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
 )
+export const IconRefresh = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><path d="M20 11A8 8 0 105.6 6.6"/><path d="M20 4v6h-6"/></svg>
+)
+export const IconX = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><path d="M6 6l12 12M18 6L6 18"/></svg>
+)
+export const IconChevronDown = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><path d="M6 9l6 6 6-6"/></svg>
+)
+export const IconDownload = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+)
+export const IconRotate = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><path d="M3 12a9 9 0 1015.46-6.36L21 8"/><path d="M21 3v5h-5"/></svg>
+)
+export const IconSpinner = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}><path d="M12 3a9 9 0 019 9"/></svg>
+)
