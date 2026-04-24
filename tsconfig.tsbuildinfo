@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/data.ts","./src/main.tsx","./src/components/icons.tsx","./src/components/logo.tsx","./src/components/sidebar.tsx","./src/components/ui.tsx","./src/views/dashboard.tsx","./src/views/landing.tsx","./src/views/payroll.tsx","./src/views/simple.tsx","./src/views/treasury.tsx"],"version":"5.9.3"}
