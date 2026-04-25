@@ -46,6 +46,8 @@ export function Button({
   variant = 'primary',
   size = 'md',
   onClick,
+  onMouseEnter,
+  onFocus,
   type = 'button',
   className = '',
   disabled,
@@ -55,6 +57,8 @@ export function Button({
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
   size?: 'md' | 'sm' | 'lg'
   onClick?: () => void
+  onMouseEnter?: () => void
+  onFocus?: () => void
   type?: 'button' | 'submit'
   className?: string
   disabled?: boolean
@@ -75,6 +79,8 @@ export function Button({
     <button
       type={type}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onFocus={onFocus}
       disabled={disabled}
       title={title}
       className={`inline-flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 disabled:opacity-50 disabled:pointer-events-none active:translate-y-[0.5px] ${sizes[size]} ${variants[variant]} ${className}`}

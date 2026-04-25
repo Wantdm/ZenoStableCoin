@@ -5,10 +5,12 @@ import { Button, Pill, Card, LiveDot, CountUpNumber } from '../components/UI'
 import { competitors } from '../data'
 import { IconArrowRight, IconBolt, IconGlobe, IconShield, IconTrendUp, IconCheck, IconPayroll } from '../components/Icons'
 import { useApp } from '../context/AppContext'
+import { preloadView } from '../preload'
 
 export function Landing() {
   const { navigate, toast } = useApp()
   const launch = () => navigate('app')
+  const prefetchApp = () => { preloadView.dashboard() }
   const productRef = useRef<HTMLDivElement>(null)
   const howRef = useRef<HTMLDivElement>(null)
   const pricingRef = useRef<HTMLDivElement>(null)
@@ -39,8 +41,8 @@ export function Landing() {
             <NavLink onClick={() => scrollTo(aboutRef)}>About</NavLink>
           </nav>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={launch}>Sign in</Button>
-            <Button variant="primary" size="sm" onClick={launch}>Launch app <IconArrowRight width={14} height={14} /></Button>
+            <Button variant="ghost" size="sm" onClick={launch} onMouseEnter={prefetchApp} onFocus={prefetchApp}>Sign in</Button>
+            <Button variant="primary" size="sm" onClick={launch} onMouseEnter={prefetchApp} onFocus={prefetchApp}>Launch app <IconArrowRight width={14} height={14} /></Button>
           </div>
         </div>
       </header>
@@ -60,7 +62,7 @@ export function Landing() {
             <span className="font-mono text-text-primary">2–7%</span> and <span className="font-mono text-text-primary">3–5 days</span> with SWIFT.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button variant="primary" size="lg" onClick={launch}>Launch app <IconArrowRight width={16} height={16} /></Button>
+            <Button variant="primary" size="lg" onClick={launch} onMouseEnter={prefetchApp} onFocus={prefetchApp}>Launch app <IconArrowRight width={16} height={16} /></Button>
             <Button variant="secondary" size="lg" onClick={() => scrollTo(howRef)}>Read the blueprint</Button>
           </div>
 
@@ -183,7 +185,7 @@ export function Landing() {
               Traditional payroll was built for full-time W-2 in one country. Zeno is built for the way teams actually work in {new Date().getFullYear()}: mostly remote, mostly 1099, mostly not American.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
-              <Button variant="primary" onClick={launch}>Launch app <IconArrowRight width={14} height={14} /></Button>
+              <Button variant="primary" onClick={launch} onMouseEnter={prefetchApp} onFocus={prefetchApp}>Launch app <IconArrowRight width={14} height={14} /></Button>
               <Button variant="secondary" onClick={() => toast('Thesis is in our YC application — happy to share', 'green')}>Read our thesis</Button>
               <a
                 href="https://github.com/Wantdm/ZenoStableCoin"
@@ -217,7 +219,7 @@ export function Landing() {
               No bank wires. No 2–7% fees. No 3–5 day settlement. Just stablecoin rails and a treasury that earns.
             </p>
             <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-              <Button variant="primary" size="lg" onClick={launch}>Launch app <IconArrowRight width={16} height={16} /></Button>
+              <Button variant="primary" size="lg" onClick={launch} onMouseEnter={prefetchApp} onFocus={prefetchApp}>Launch app <IconArrowRight width={16} height={16} /></Button>
               <Button variant="secondary" size="lg" onClick={() => scrollTo(howRef)}>Read the blueprint</Button>
             </div>
           </div>
