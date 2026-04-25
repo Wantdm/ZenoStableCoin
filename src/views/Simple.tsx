@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Card, Pill, LiveDot, Avatar, MethodBadge, Button, CountUpNumber } from '../components/UI'
-import { useApp, formatActivityDate, Activity } from '../context/AppContext'
+import { useApp, formatActivityDate } from '../context/AppContext'
+import { archiveActivity } from '../data'
 import { IconPlus, IconDownload, IconBolt, IconTrendUp, IconRefresh } from '../components/Icons'
 import { AnimatePresence, motion } from 'framer-motion'
 import { TopBar } from '../components/TopBar'
@@ -43,17 +44,9 @@ export function Team() {
   )
 }
 
-const archiveTx: Activity[] = [
-  { id: 'f', type: 'Payroll', detail: 'February payroll · 5 contractors', amount: -24200, date: 'Feb 28' },
-  { id: 'g', type: 'Deposit', detail: 'Wire from Mercury · USDC', amount: 75000, date: 'Feb 12' },
-  { id: 'h', type: 'Swap', detail: 'USDT → T-bill tokens', amount: -20000, date: 'Feb 05' },
-  { id: 'i', type: 'Yield', detail: 'T-bill token yield · accrued', amount: 547, date: 'Jan 31' },
-  { id: 'j', type: 'Payroll', detail: 'January payroll · 5 contractors', amount: -23800, date: 'Jan 31' },
-]
-
 export function Transactions() {
   const { toast, activity } = useApp()
-  const allTx = useMemo(() => [...activity, ...archiveTx], [activity])
+  const allTx = useMemo(() => [...activity, ...archiveActivity], [activity])
   const totals = useMemo(() => {
     const inSum = allTx.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0)
     const outSum = allTx.filter((t) => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0)

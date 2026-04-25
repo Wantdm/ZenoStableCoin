@@ -31,13 +31,57 @@ export const treasury = {
   ],
 }
 
+function shortDate(d: Date): string {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+function daysAgo(n: number): string {
+  const d = new Date()
+  d.setHours(12, 0, 0, 0)
+  d.setDate(d.getDate() - n)
+  return shortDate(d)
+}
+
+function lastEom(): { label: string; monthLong: string } {
+  const d = new Date()
+  d.setHours(12, 0, 0, 0)
+  d.setDate(0) // moves to last day of prior month
+  return { label: shortDate(d), monthLong: d.toLocaleDateString('en-US', { month: 'long' }) }
+}
+
+const _eom = lastEom()
+
 export const recentActivity = [
-  { id: 'a', type: 'Payroll', detail: 'March payroll · 5 contractors', amount: -24900, date: 'Mar 31' },
-  { id: 'b', type: 'Yield', detail: 'T-bill token yield · accrued', amount: 612, date: 'Mar 28' },
-  { id: 'c', type: 'Deposit', detail: 'Wire from Mercury · USDC', amount: 50000, date: 'Mar 24' },
-  { id: 'd', type: 'Swap', detail: 'USDC → T-bill tokens', amount: -30000, date: 'Mar 20' },
-  { id: 'e', type: 'Yield', detail: 'T-bill token yield · accrued', amount: 598, date: 'Mar 14' },
+  { id: 'a', type: 'Payroll', detail: `${_eom.monthLong} payroll · ${team.length} contractors`, amount: -24900, date: _eom.label },
+  { id: 'b', type: 'Yield', detail: 'T-bill token yield · accrued', amount: 612, date: daysAgo(27) },
+  { id: 'c', type: 'Deposit', detail: 'Wire from Mercury · USDC', amount: 50000, date: daysAgo(31) },
+  { id: 'd', type: 'Swap', detail: 'USDC → T-bill tokens', amount: -30000, date: daysAgo(35) },
+  { id: 'e', type: 'Yield', detail: 'T-bill token yield · accrued', amount: 598, date: daysAgo(41) },
 ]
+
+export const archiveActivity = (() => {
+  const twoMonthsBack = new Date()
+  twoMonthsBack.setHours(12, 0, 0, 0)
+  twoMonthsBack.setDate(1)
+  twoMonthsBack.setMonth(twoMonthsBack.getMonth() - 1)
+  twoMonthsBack.setDate(0) // EOM of two months ago
+  const twoBack = { label: shortDate(twoMonthsBack), monthLong: twoMonthsBack.toLocaleDateString('en-US', { month: 'long' }) }
+
+  const threeMonthsBack = new Date()
+  threeMonthsBack.setHours(12, 0, 0, 0)
+  threeMonthsBack.setDate(1)
+  threeMonthsBack.setMonth(threeMonthsBack.getMonth() - 2)
+  threeMonthsBack.setDate(0) // EOM of three months ago
+  const threeBack = { label: shortDate(threeMonthsBack), monthLong: threeMonthsBack.toLocaleDateString('en-US', { month: 'long' }) }
+
+  return [
+    { id: 'f', type: 'Payroll' as const, detail: `${twoBack.monthLong} payroll · ${team.length} contractors`, amount: -24200, date: twoBack.label },
+    { id: 'g', type: 'Deposit' as const, detail: 'Wire from Mercury · USDC', amount: 75000, date: daysAgo(70) },
+    { id: 'h', type: 'Swap' as const, detail: 'USDT → T-bill tokens', amount: -20000, date: daysAgo(78) },
+    { id: 'i', type: 'Yield' as const, detail: 'T-bill token yield · accrued', amount: 547, date: threeBack.label },
+    { id: 'j', type: 'Payroll' as const, detail: `${threeBack.monthLong} payroll · ${team.length} contractors`, amount: -23800, date: threeBack.label },
+  ]
+})()
 
 export const competitors = [
   { name: 'Zeno', fee: '0.2%', speed: '< 3 min', yield: '4.5% APY', coverage: 'Global', highlight: true },
