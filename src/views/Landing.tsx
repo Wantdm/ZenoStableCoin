@@ -7,7 +7,7 @@ import { IconArrowRight, IconBolt, IconGlobe, IconShield, IconTrendUp, IconCheck
 import { useApp } from '../context/AppContext'
 
 export function Landing() {
-  const { navigate } = useApp()
+  const { navigate, toast } = useApp()
   const launch = () => navigate('app')
   const productRef = useRef<HTMLDivElement>(null)
   const howRef = useRef<HTMLDivElement>(null)
@@ -147,7 +147,7 @@ export function Landing() {
 {"  "}<span className="text-info-500">"recipients"</span>: [<span className="text-text-muted">…</span>]{'\n'}
 <span className="text-text-muted">{"}"}</span>
             </pre>
-            <Button variant="secondary" className="mt-5">View API reference <IconArrowRight width={14} height={14} /></Button>
+            <Button variant="secondary" className="mt-5" onClick={() => toast('API docs coming soon — drop your email at hi@zeno.finance', 'green')}>View API reference <IconArrowRight width={14} height={14} /></Button>
           </Card>
           <Card className="p-8">
             <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-brand-400">Integrations</div>
@@ -155,9 +155,13 @@ export function Landing() {
             <p className="mt-3 text-[14px] leading-relaxed text-text-secondary">Pipe contractors in from the tools you already use. CSV works if you don't.</p>
             <div className="mt-5 grid grid-cols-3 gap-2">
               {['Rippling', 'Gusto', 'Notion', 'Deel', 'Airtable', 'CSV'].map((n) => (
-                <div key={n} className="rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2.5 text-center text-[12.5px] text-text-secondary transition-colors hover:border-border hover:text-text-primary">
+                <button
+                  key={n}
+                  onClick={() => toast(`${n} integration on the roadmap — CSV is shipping today`, 'green')}
+                  className="rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2.5 text-center text-[12.5px] text-text-secondary transition-colors hover:border-brand-500/40 hover:text-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+                >
                   {n}
-                </div>
+                </button>
               ))}
             </div>
           </Card>
@@ -175,7 +179,7 @@ export function Landing() {
             </p>
             <div className="mt-6 flex gap-2">
               <Button variant="primary" onClick={launch}>Launch app <IconArrowRight width={14} height={14} /></Button>
-              <Button variant="secondary">Read our thesis</Button>
+              <Button variant="secondary" onClick={() => toast('Thesis is in our YC application — happy to share', 'green')}>Read our thesis</Button>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -209,7 +213,13 @@ export function Landing() {
           <div className="flex items-center gap-3"><Logo size={22} /><span className="text-text-muted">© 2026 Zeno Labs</span></div>
           <div className="flex gap-6">
             {['Privacy', 'Terms', 'Status', 'Contact'].map((l) => (
-              <a key={l} href="#" onClick={(e) => e.preventDefault()} className="transition-colors hover:text-text-primary">{l}</a>
+              <button
+                key={l}
+                onClick={() => toast(l === 'Contact' ? 'Reach us at hi@zeno.finance' : `${l} page coming soon`)}
+                className="transition-colors hover:text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-500/30 rounded-md"
+              >
+                {l}
+              </button>
             ))}
           </div>
         </div>
@@ -228,21 +238,35 @@ function NavLink({ children, onClick }: { children: React.ReactNode; onClick: ()
 
 function Feature({ icon, title, copy }: { icon: React.ReactNode; title: string; copy: string }) {
   return (
-    <Card className="p-6 transition-colors hover:border-border">
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500/12 text-brand-400">{icon}</div>
-      <h3 className="mt-4 text-[15px] font-semibold">{title}</h3>
-      <p className="mt-1.5 text-[13.5px] leading-relaxed text-text-secondary">{copy}</p>
-    </Card>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+    >
+      <Card className="p-6 transition-colors hover:border-border">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500/12 text-brand-400">{icon}</div>
+        <h3 className="mt-4 text-[15px] font-semibold">{title}</h3>
+        <p className="mt-1.5 text-[13.5px] leading-relaxed text-text-secondary">{copy}</p>
+      </Card>
+    </motion.div>
   )
 }
 
 function HowStep({ n, title, copy }: { n: string; title: string; copy: string }) {
   return (
-    <Card className="p-6">
-      <div className="font-mono text-[11.5px] font-medium text-brand-400">{n}</div>
-      <h3 className="mt-3 text-[16px] font-semibold">{title}</h3>
-      <p className="mt-2 text-[13.5px] leading-relaxed text-text-secondary">{copy}</p>
-    </Card>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+    >
+      <Card className="p-6">
+        <div className="font-mono text-[11.5px] font-medium text-brand-400">{n}</div>
+        <h3 className="mt-3 text-[16px] font-semibold">{title}</h3>
+        <p className="mt-2 text-[13.5px] leading-relaxed text-text-secondary">{copy}</p>
+      </Card>
+    </motion.div>
   )
 }
 
@@ -270,7 +294,7 @@ function SavingsCallout({ onEnterApp }: { onEnterApp: () => void }) {
             Based on a $25,600 monthly payroll. Zeno's 0.2% flat fee vs SWIFT's 2–7%, plus 4.5% APY on your idle operating balance — together that's ~$28.8k / year staying in your treasury instead of leaking to intermediaries.
           </p>
           <div className="mt-5">
-            <Button variant="primary" onClick={onEnterApp}>See the math in the app <IconArrowRight width={14} height={14} /></Button>
+            <Button variant="primary" onClick={onEnterApp}>Open the live demo <IconArrowRight width={14} height={14} /></Button>
           </div>
         </div>
         <div className="col-span-2">
