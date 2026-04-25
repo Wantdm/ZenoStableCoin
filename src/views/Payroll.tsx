@@ -465,7 +465,7 @@ const TOTAL_DURATION_MS = 6200 // compressed screen time
 const REAL_TIME_END = 28 // T+28s shown to user
 
 function StepExecute() {
-  const { team, setView, goToPayroll, addTransaction } = useApp()
+  const { team, setView, goToPayroll, addTransaction, toast } = useApp()
   const total = useMemo(() => team.reduce((s, m) => s + m.amount, 0), [team])
 
   const [elapsedMs, setElapsedMs] = useState(0)
@@ -598,8 +598,13 @@ function StepExecute() {
         </div>
 
         <ul className="mt-7 divide-y divide-border-subtle">
-          {team.map((m) => {
+          {team.map((m, i) => {
             const s = status[m.id]
+            const hashLabel = `0x${m.id.padStart(4, '0')}…${m.initials.toLowerCase()}`
+            const showReceipt = () => {
+              const block = 18923512 + i * 17 + (m.initials.charCodeAt(0) % 31)
+              toast(`Receipt ${hashLabel} · Block ${block.toLocaleString()} · ${m.method}`, 'green')
+            }
             return (
               <li key={m.id} className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3">
@@ -611,7 +616,17 @@ function StepExecute() {
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="font-mono text-[12.5px] text-text-secondary">${m.amount.toLocaleString()}</span>
-                  <span className="font-mono text-[11px] text-text-muted">0x{m.id.padStart(4, '0')}…{m.initials.toLowerCase()}</span>
+                  {s === 'Sent' ? (
+                    <button
+                      onClick={showReceipt}
+                      className="rounded px-1 font-mono text-[11px] text-text-muted underline-offset-2 transition-colors hover:text-brand-400 hover:underline focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+                      title="View receipt"
+                    >
+                      {hashLabel}
+                    </button>
+                  ) : (
+                    <span className="font-mono text-[11px] text-text-muted">{hashLabel}</span>
+                  )}
                   <RecipientBadge state={s} />
                 </div>
               </li>
