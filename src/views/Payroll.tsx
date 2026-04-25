@@ -80,6 +80,13 @@ export function Payroll() {
 }
 
 /* ───────────────────────── Step 1 ───────────────────────── */
+const csvSeed: Partial<Member>[] = [
+  { name: 'Diego Hernández', role: 'Mobile Engineer', country: 'Mexico', countryCode: 'MX', method: 'USDC', amount: 4400, avatarColor: 'bg-orange-600' },
+  { name: 'Priya Nair', role: 'QA Lead', country: 'India', countryCode: 'IN', method: 'USDT', amount: 3600, avatarColor: 'bg-violet-600' },
+  { name: 'Tomás Becker', role: 'DevOps', country: 'Argentina', countryCode: 'AR', method: 'USDC', amount: 4800, avatarColor: 'bg-sky-600' },
+  { name: 'Nia Achebe', role: 'Brand Designer', country: 'Nigeria', countryCode: 'NG', method: 'USDT', amount: 3300, avatarColor: 'bg-rose-700' },
+]
+
 function StepAmounts({ onNext }: { onNext: () => void }) {
   const { team, setAmount, addMember, removeMember, toast } = useApp()
   const total = useMemo(() => team.reduce((s, m) => s + (Number(m.amount) || 0), 0), [team])
@@ -92,7 +99,8 @@ function StepAmounts({ onNext }: { onNext: () => void }) {
   }
 
   const handleCSV = () => {
-    toast('Demo CSV imported — 12 contractors added', 'green')
+    csvSeed.forEach((m) => addMember(m))
+    toast(`Imported ${csvSeed.length} contractors from sample CSV`, 'green')
   }
 
   return (

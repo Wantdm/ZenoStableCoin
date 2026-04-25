@@ -97,7 +97,10 @@ export function Sidebar() {
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-info-500 text-sm font-semibold text-white">AC</div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-[13.5px] font-medium text-text-primary">Acme Corp</div>
+            <div className="flex items-center gap-1.5">
+              <span className="truncate text-[13.5px] font-medium text-text-primary">Acme Corp</span>
+              <span className="rounded bg-brand-500/15 px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-brand-400">Demo</span>
+            </div>
             <div className="truncate text-[11.5px] text-text-muted">Growth plan</div>
           </div>
           <IconChevronDown width={14} height={14} className={`text-text-muted transition-transform ${menuOpen ? 'rotate-180' : ''}`} />
