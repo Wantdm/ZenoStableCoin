@@ -60,12 +60,30 @@ export function Transactions() {
     const yieldSum = allTx.filter((t) => t.type === 'Yield').reduce((s, t) => s + t.amount, 0)
     return { inSum, outSum, yieldSum }
   }, [allTx])
+
+  const exportCsv = () => {
+    const escape = (v: string) => /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v
+    const header = ['Type', 'Detail', 'Amount (USD)', 'Date']
+    const rows = allTx.map((t) => [t.type, t.detail, t.amount.toFixed(2), formatActivityDate(t)])
+    const csv = [header, ...rows].map((row) => row.map((cell) => escape(String(cell))).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `zeno-transactions-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    toast(`Exported ${allTx.length} transactions`, 'green')
+  }
+
   return (
     <Section
       title="Transactions"
       actions={
         <>
-          <Button variant="secondary" onClick={() => toast('Export queued — CSV ready in seconds', 'green')}>
+          <Button variant="secondary" onClick={exportCsv}>
             <IconDownload width={14} height={14} /> Export CSV
           </Button>
         </>
