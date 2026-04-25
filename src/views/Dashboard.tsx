@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card, Pill, LiveDot, Button, Avatar, MethodBadge, CountUpNumber } from '../components/UI'
 import { treasury } from '../data'
-import { IconTrendUp, IconArrowRight, IconBolt } from '../components/Icons'
+import { IconTrendUp, IconArrowRight, IconBolt, IconPlus, IconRefresh } from '../components/Icons'
 import { useApp, formatActivityDate } from '../context/AppContext'
 import { TopBar } from '../components/TopBar'
 
@@ -86,9 +86,14 @@ export function Dashboard() {
             <ul>
               {recent.map((a) => (
                 <li key={a.id} className="flex items-center justify-between border-b border-border-subtle px-6 py-3 last:border-b-0">
-                  <div>
-                    <div className="text-[13px] font-medium">{a.type}</div>
-                    <div className="text-[11.5px] text-text-muted">{formatActivityDate(a)}</div>
+                  <div className="flex items-center gap-2.5">
+                    <span className={`flex h-7 w-7 items-center justify-center rounded-md ${a.amount >= 0 ? 'bg-brand-500/12 text-brand-500' : 'bg-white/[0.05] text-text-secondary'}`}>
+                      <ActivityIcon type={a.type} />
+                    </span>
+                    <div>
+                      <div className="text-[13px] font-medium">{a.type}</div>
+                      <div className="text-[11.5px] text-text-muted">{formatActivityDate(a)}</div>
+                    </div>
                   </div>
                   <div className={`font-mono text-[13px] tabular-nums ${a.amount >= 0 ? 'text-brand-400' : 'text-text-primary'}`}>
                     {a.amount >= 0 ? '+' : '−'}${Math.abs(a.amount).toLocaleString()}
@@ -101,6 +106,16 @@ export function Dashboard() {
       </div>
     </div>
   )
+}
+
+function ActivityIcon({ type }: { type: 'Payroll' | 'Yield' | 'Deposit' | 'Swap' }) {
+  const map = {
+    Payroll: <IconBolt width={12} height={12} />,
+    Yield: <IconTrendUp width={12} height={12} />,
+    Deposit: <IconPlus width={12} height={12} />,
+    Swap: <IconRefresh width={12} height={12} />,
+  }
+  return map[type]
 }
 
 function Stat({ label, valueEl, sub, subTone = 'muted' }: { label: string; valueEl: React.ReactNode; sub: string; subTone?: 'muted' | 'green' }) {
