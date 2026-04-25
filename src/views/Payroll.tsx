@@ -650,19 +650,47 @@ function StepExecute() {
         </ul>
 
         {done && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
-            className="mt-7 flex items-center justify-end gap-3 border-t border-border-subtle pt-5"
-          >
-            <Button variant="secondary" onClick={() => setView('transactions')}>View transactions</Button>
-            <Button variant="primary" onClick={onReset}>
-              <IconBolt width={14} height={14} /> Run another payroll
-            </Button>
-          </motion.div>
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="mt-7 grid grid-cols-4 gap-3 border-t border-border-subtle pt-5"
+            >
+              <Stat label="Stablecoins minted" value={`$${total.toLocaleString()}`} />
+              <Stat label="Countries reached" value={String(new Set(team.map((m) => m.country)).size)} />
+              <Stat label="Network fee (0.2%)" value={`$${(Math.round(total * 0.002 * 100) / 100).toLocaleString()}`} />
+              <Stat label="Receipts written" value={String(team.length)} tone="green" />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, delay: 0.2 }}
+              className="mt-5 flex items-center justify-between border-t border-border-subtle pt-5"
+            >
+              <p className="max-w-md text-[12.5px] text-text-muted">
+                A SWIFT wire of this size would cost ~${Math.round(total * 0.05).toLocaleString()} and clear in 3–5 days.
+              </p>
+              <div className="flex items-center gap-3">
+                <Button variant="secondary" onClick={() => setView('transactions')}>View transactions</Button>
+                <Button variant="primary" onClick={onReset}>
+                  <IconBolt width={14} height={14} /> Run another payroll
+                </Button>
+              </div>
+            </motion.div>
+          </>
         )}
       </Card>
+    </div>
+  )
+}
+
+function Stat({ label, value, tone = 'neutral' }: { label: string; value: string; tone?: 'neutral' | 'green' }) {
+  return (
+    <div className="rounded-lg border border-border-subtle bg-bg-elevated px-4 py-3">
+      <div className="text-[10.5px] uppercase tracking-[0.1em] text-text-muted">{label}</div>
+      <div className={`mt-1 font-mono text-[16px] font-semibold tabular-nums ${tone === 'green' ? 'text-brand-400' : 'text-text-primary'}`}>{value}</div>
     </div>
   )
 }
