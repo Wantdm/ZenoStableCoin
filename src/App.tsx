@@ -4,6 +4,7 @@ import { AppProvider, useApp, View } from './context/AppContext'
 import { Sidebar } from './components/Sidebar'
 import { ToastHost } from './components/Toast'
 import { CommandPalette } from './components/CommandPalette'
+import { ShortcutHelp } from './components/ShortcutHelp'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 const Landing = lazy(() => import('./views/Landing').then((m) => ({ default: m.Landing })))
@@ -121,6 +122,7 @@ export default function App() {
       <AppProvider>
         <Shell />
         <CommandPalette />
+        <ShortcutHelp />
         <ToastHost />
       </AppProvider>
     </ErrorBoundary>
