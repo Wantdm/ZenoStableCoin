@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Card, Pill, LiveDot, Avatar, MethodBadge, Button, CountUpNumber } from '../components/UI'
 import { useApp, formatActivityDate, Activity } from '../context/AppContext'
 import { IconPlus, IconDownload, IconBolt, IconTrendUp, IconRefresh } from '../components/Icons'
@@ -255,10 +255,101 @@ export function Reports() {
 }
 
 export function Settings() {
+  const { toast, resetDemo, isExecuting } = useApp()
+  const apiKey = 'zk_live_3c9f8e2a4b6d7f1c5e8a9b0d2f4a6c8e'
+  const masked = `${apiKey.slice(0, 12)}${'•'.repeat(20)}${apiKey.slice(-4)}`
+
+  const copy = (label: string, value: string) => {
+    navigator.clipboard?.writeText(value).catch(() => {})
+    toast(`${label} copied`, 'green')
+  }
+
   return (
     <Section title="Settings">
-      <ComingSoon title="Settings" desc="Workspace, API keys, team permissions, treasury rules, and webhook configuration." />
+      <div className="grid max-w-4xl grid-cols-1 gap-5">
+        <SettingCard title="Workspace" desc="Identity and plan details for this Zeno account.">
+          <SettingRow label="Workspace name" value="Acme Corp" />
+          <SettingRow label="Plan" value="Growth · $99/mo" />
+          <SettingRow label="Created" value="Jan 14, 2026" />
+        </SettingCard>
+
+        <SettingCard title="API access" desc="Trigger payroll runs from your stack. Rotate the key after a leak.">
+          <div className="flex items-center justify-between gap-3 py-2.5">
+            <span className="font-mono text-[12.5px] text-text-secondary">{masked}</span>
+            <div className="flex gap-2">
+              <Button variant="secondary" size="sm" onClick={() => copy('API key', apiKey)}>Copy</Button>
+              <Button variant="secondary" size="sm" onClick={() => toast('Key rotated · old key revoked in 24h', 'green')}>Rotate</Button>
+            </div>
+          </div>
+          <SettingRow label="Webhooks" value="https://hooks.acme.dev/zeno" />
+          <SettingRow label="Rate limit" value="100 req/min" />
+        </SettingCard>
+
+        <SettingCard title="Treasury rules" desc="How idle cash is allocated and when redemption fires.">
+          <ToggleRow label="Auto-rebalance to T-bills" desc="Keep ≥ 1× monthly payroll liquid; route the rest to yield." defaultOn />
+          <ToggleRow label="Daily yield compounding" desc="Reinvest accrued yield into the same allocation." defaultOn />
+          <ToggleRow label="Redeem ahead of payroll" desc="Pre-fund a payroll 24h before its scheduled run." />
+        </SettingCard>
+
+        <SettingCard title="Danger zone" desc="Reset demo state, delete workspace, revoke all sessions." danger>
+          <div className="flex items-center justify-between gap-3 py-2.5">
+            <div>
+              <div className="text-[13px] font-medium text-text-primary">Reset demo state</div>
+              <div className="text-[12px] text-text-muted">Restores seed team, balance, and activity feed.</div>
+            </div>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => isExecuting ? toast('Wait for payroll to finish before resetting') : resetDemo()}
+            >
+              Reset
+            </Button>
+          </div>
+        </SettingCard>
+      </div>
     </Section>
+  )
+}
+
+function SettingCard({ title, desc, children, danger = false }: { title: string; desc: string; children: React.ReactNode; danger?: boolean }) {
+  return (
+    <Card className={`p-6 ${danger ? 'border-rose-500/20' : ''}`}>
+      <div className="flex items-baseline justify-between">
+        <h3 className={`text-[15px] font-semibold ${danger ? 'text-rose-300' : 'text-text-primary'}`}>{title}</h3>
+      </div>
+      <p className="mt-1 text-[12.5px] text-text-secondary">{desc}</p>
+      <div className="mt-4 divide-y divide-border-subtle">{children}</div>
+    </Card>
+  )
+}
+
+function SettingRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between py-2.5">
+      <span className="text-[12.5px] text-text-muted">{label}</span>
+      <span className="font-mono text-[12.5px] text-text-primary">{value}</span>
+    </div>
+  )
+}
+
+function ToggleRow({ label, desc, defaultOn = false }: { label: string; desc: string; defaultOn?: boolean }) {
+  const [on, setOn] = useState(defaultOn)
+  return (
+    <div className="flex items-start justify-between gap-4 py-3">
+      <div>
+        <div className="text-[13px] font-medium text-text-primary">{label}</div>
+        <div className="mt-0.5 text-[12px] text-text-muted">{desc}</div>
+      </div>
+      <button
+        onClick={() => setOn((v) => !v)}
+        role="switch"
+        aria-checked={on}
+        aria-label={label}
+        className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/30 ${on ? 'bg-brand-500' : 'bg-white/[0.06]'}`}
+      >
+        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${on ? 'translate-x-[18px]' : 'translate-x-[4px]'}`} />
+      </button>
+    </div>
   )
 }
 
