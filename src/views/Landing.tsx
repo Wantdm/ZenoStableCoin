@@ -15,6 +15,11 @@ export function Landing() {
   const docsRef = useRef<HTMLDivElement>(null)
   const aboutRef = useRef<HTMLDivElement>(null)
 
+  const idempotencyKey = (() => {
+    const d = new Date()
+    return `payroll-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+  })()
+
   const scrollTo = (ref: React.RefObject<HTMLElement>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -143,7 +148,7 @@ export function Landing() {
             <pre className="mt-5 overflow-x-auto rounded-lg border border-border-subtle bg-bg-base px-4 py-3.5 font-mono text-[12px] leading-relaxed text-text-secondary">
 <span className="text-brand-400">POST</span> https://api.zeno.finance/v1/payrolls{'\n'}
 <span className="text-text-muted">{"{"}</span>{'\n'}
-{"  "}<span className="text-info-500">"idempotency_key"</span>: <span className="text-brand-400">"2026-04-apr"</span>,{'\n'}
+{"  "}<span className="text-info-500">"idempotency_key"</span>: <span className="text-brand-400">"{idempotencyKey}"</span>,{'\n'}
 {"  "}<span className="text-info-500">"recipients"</span>: [<span className="text-text-muted">…</span>]{'\n'}
 <span className="text-text-muted">{"}"}</span>
             </pre>
