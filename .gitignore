@@ -1,6 +1,7 @@
 node_modules
 dist
 *.tsbuildinfo
+.claude/
 .DS_Store
 .vercel
 *.log
