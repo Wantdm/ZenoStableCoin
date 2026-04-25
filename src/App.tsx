@@ -3,6 +3,7 @@ import { AppProvider, useApp } from './context/AppContext'
 import { Sidebar } from './components/Sidebar'
 import { ToastHost } from './components/Toast'
 import { CommandPalette } from './components/CommandPalette'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { Landing } from './views/Landing'
 import { Dashboard } from './views/Dashboard'
 import { Payroll } from './views/Payroll'
@@ -62,10 +63,12 @@ function Shell() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <Shell />
-      <CommandPalette />
-      <ToastHost />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <Shell />
+        <CommandPalette />
+        <ToastHost />
+      </AppProvider>
+    </ErrorBoundary>
   )
 }
