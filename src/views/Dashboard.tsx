@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card, Pill, LiveDot, Button, Avatar, MethodBadge, CountUpNumber } from '../components/UI'
 import { treasury } from '../data'
-import { IconTrendUp, IconArrowRight, IconBolt, IconPlus, IconRefresh } from '../components/Icons'
+import { IconTrendUp, IconArrowRight, IconBolt } from '../components/Icons'
 import { useApp, formatActivityDate } from '../context/AppContext'
 import { TopBar } from '../components/TopBar'
+import { ActivityIcon } from '../components/ActivityIcon'
 
 export function Dashboard() {
   const { team, setView, goToPayroll, treasuryBalance, treasuryYieldMtd, activity } = useApp()
@@ -114,16 +115,6 @@ export function Dashboard() {
       </div>
     </div>
   )
-}
-
-function ActivityIcon({ type }: { type: 'Payroll' | 'Yield' | 'Deposit' | 'Swap' }) {
-  const map = {
-    Payroll: <IconBolt width={12} height={12} />,
-    Yield: <IconTrendUp width={12} height={12} />,
-    Deposit: <IconPlus width={12} height={12} />,
-    Swap: <IconRefresh width={12} height={12} />,
-  }
-  return map[type]
 }
 
 function Stat({ label, valueEl, sub, subTone = 'muted' }: { label: string; valueEl: React.ReactNode; sub: string; subTone?: 'muted' | 'green' }) {

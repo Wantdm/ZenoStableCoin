@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Card, Pill, LiveDot, Avatar, MethodBadge, Button, CountUpNumber } from '../components/UI'
 import { useApp, formatActivityDate } from '../context/AppContext'
 import { archiveActivity } from '../data'
-import { IconPlus, IconDownload, IconBolt, IconTrendUp, IconRefresh } from '../components/Icons'
+import { IconPlus, IconDownload } from '../components/Icons'
 import { AnimatePresence, motion } from 'framer-motion'
 import { TopBar } from '../components/TopBar'
+import { ActivityIcon } from '../components/ActivityIcon'
 
 export function Team() {
   const { team, toast, goToPayroll } = useApp()
@@ -425,16 +426,6 @@ function Section({ title, children, actions }: { title: string; children: React.
   )
 }
 
-function ActivityIcon({ type }: { type: 'Payroll' | 'Yield' | 'Deposit' | 'Swap' }) {
-  const map = {
-    Payroll: <IconBolt width={12} height={12} />,
-    Yield: <IconTrendUp width={12} height={12} />,
-    Deposit: <IconPlus width={12} height={12} />,
-    Swap: <IconRefresh width={12} height={12} />,
-  }
-  return map[type]
-}
-
 function Mini({ label, value, tone = 'neutral' }: { label: string; value: React.ReactNode; tone?: 'neutral' | 'green' }) {
   return (
     <Card className="p-5">
@@ -444,21 +435,3 @@ function Mini({ label, value, tone = 'neutral' }: { label: string; value: React.
   )
 }
 
-function ComingSoon({ title, desc }: { title: string; desc: string }) {
-  return (
-    <Card className="mx-auto max-w-xl p-12 text-center">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500/10 text-brand-400">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 7v5l3 2" />
-        </svg>
-      </div>
-      <h2 className="mt-5 text-[20px] font-semibold">{title} · coming soon</h2>
-      <p className="mx-auto mt-2 max-w-sm text-[13.5px] text-text-secondary">{desc}</p>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-[11.5px]">
-        {['Design spec'].map((s) => <Pill key={s} tone="green">{s} · ready</Pill>)}
-        {['Engineering'].map((s) => <Pill key={s} tone="amber">{s} · in progress</Pill>)}
-      </div>
-    </Card>
-  )
-}
