@@ -1,19 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode } from 'react'
-import { team as seedTeam, treasury as seedTreasury, recentActivity as seedActivity, Member, Method } from '../data'
+import { team as seedTeam, treasury as seedTreasury, recentActivity as seedActivity, Member, Method, Activity } from '../data'
+
+export type { Activity } from '../data'
 
 export type View = 'dashboard' | 'payroll' | 'treasury' | 'team' | 'transactions' | 'reports' | 'settings'
 export type Route = 'landing' | 'app'
 
 type Toast = { id: number; msg: string; tone?: 'neutral' | 'green' }
-
-export type Activity = {
-  id: string
-  type: 'Payroll' | 'Yield' | 'Deposit' | 'Swap'
-  detail: string
-  amount: number
-  date: string
-  createdAt?: number
-}
 
 export function formatActivityDate(a: Activity, now: number = Date.now()): string {
   if (!a.createdAt) return a.date
@@ -91,7 +84,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const [treasuryBalance, setTreasuryBalance] = useState(seedTreasury.balance)
   const [treasuryYieldMtd, setTreasuryYieldMtd] = useState(seedTreasury.yieldMtd)
-  const [activity, setActivity] = useState<Activity[]>(seedActivity as Activity[])
+  const [activity, setActivity] = useState<Activity[]>(seedActivity)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const balanceTargetRef = useRef(seedTreasury.balance)
 
@@ -254,7 +247,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTeam(seedTeam)
     setPayrollStep(0)
     setAuthorized(false)
-    setActivity(seedActivity as Activity[])
+    setActivity(seedActivity)
     setTreasuryBalance(seedTreasury.balance)
     setTreasuryYieldMtd(seedTreasury.yieldMtd)
     balanceTargetRef.current = seedTreasury.balance

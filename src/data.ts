@@ -12,6 +12,17 @@ export type Member = {
   avatarColor: string
 }
 
+export type ActivityType = 'Payroll' | 'Yield' | 'Deposit' | 'Swap'
+
+export type Activity = {
+  id: string
+  type: ActivityType
+  detail: string
+  amount: number
+  date: string
+  createdAt?: number
+}
+
 export const team: Member[] = [
   { id: '1', name: 'Ana Silva', role: 'Lead Engineer', country: 'Brazil', countryCode: 'BR', method: 'USDC', amount: 4200, initials: 'AS', avatarColor: 'bg-emerald-600' },
   { id: '2', name: 'Rohan Kumar', role: 'Backend Dev', country: 'India', countryCode: 'IN', method: 'USDT', amount: 5800, initials: 'RK', avatarColor: 'bg-orange-600' },
@@ -51,7 +62,7 @@ function lastEom(): { label: string; monthLong: string } {
 
 const _eom = lastEom()
 
-export const recentActivity = [
+export const recentActivity: Activity[] = [
   { id: 'a', type: 'Payroll', detail: `${_eom.monthLong} payroll · ${team.length} contractors`, amount: -24900, date: _eom.label },
   { id: 'b', type: 'Yield', detail: 'T-bill token yield · accrued', amount: 612, date: daysAgo(27) },
   { id: 'c', type: 'Deposit', detail: 'Wire from Mercury · USDC', amount: 50000, date: daysAgo(31) },
@@ -59,7 +70,7 @@ export const recentActivity = [
   { id: 'e', type: 'Yield', detail: 'T-bill token yield · accrued', amount: 598, date: daysAgo(41) },
 ]
 
-export const archiveActivity = (() => {
+export const archiveActivity: Activity[] = (() => {
   const twoMonthsBack = new Date()
   twoMonthsBack.setHours(12, 0, 0, 0)
   twoMonthsBack.setDate(1)
@@ -75,11 +86,11 @@ export const archiveActivity = (() => {
   const threeBack = { label: shortDate(threeMonthsBack), monthLong: threeMonthsBack.toLocaleDateString('en-US', { month: 'long' }) }
 
   return [
-    { id: 'f', type: 'Payroll' as const, detail: `${twoBack.monthLong} payroll · ${team.length} contractors`, amount: -24200, date: twoBack.label },
-    { id: 'g', type: 'Deposit' as const, detail: 'Wire from Mercury · USDC', amount: 75000, date: daysAgo(70) },
-    { id: 'h', type: 'Swap' as const, detail: 'USDT → T-bill tokens', amount: -20000, date: daysAgo(78) },
-    { id: 'i', type: 'Yield' as const, detail: 'T-bill token yield · accrued', amount: 547, date: threeBack.label },
-    { id: 'j', type: 'Payroll' as const, detail: `${threeBack.monthLong} payroll · ${team.length} contractors`, amount: -23800, date: threeBack.label },
+    { id: 'f', type: 'Payroll', detail: `${twoBack.monthLong} payroll · ${team.length} contractors`, amount: -24200, date: twoBack.label },
+    { id: 'g', type: 'Deposit', detail: 'Wire from Mercury · USDC', amount: 75000, date: daysAgo(70) },
+    { id: 'h', type: 'Swap', detail: 'USDT → T-bill tokens', amount: -20000, date: daysAgo(78) },
+    { id: 'i', type: 'Yield', detail: 'T-bill token yield · accrued', amount: 547, date: threeBack.label },
+    { id: 'j', type: 'Payroll', detail: `${threeBack.monthLong} payroll · ${team.length} contractors`, amount: -23800, date: threeBack.label },
   ]
 })()
 
