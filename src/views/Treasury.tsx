@@ -7,7 +7,7 @@ import { useApp, formatActivityDate } from '../context/AppContext'
 import { TopBar } from '../components/TopBar'
 
 export function Treasury() {
-  const { goToPayroll, toast, treasuryBalance: balance, treasuryYieldMtd: yieldMtd, activity } = useApp()
+  const { goToPayroll, toast, treasuryBalance: balance, treasuryYieldMtd: yieldMtd, activity, setView } = useApp()
   const [flash, setFlash] = useState<'up' | 'down' | null>(null)
   const [showNewBadge, setShowNewBadge] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -158,7 +158,7 @@ export function Treasury() {
                   {refreshing ? <IconSpinner width={12} height={12} className="animate-spin text-brand-400" /> : <IconRefresh width={12} height={12} />}
                 </button>
               </div>
-              <Button variant="ghost" size="sm">View all <IconArrowRight width={12} height={12} /></Button>
+              <Button variant="ghost" size="sm" onClick={() => setView('transactions')}>View all <IconArrowRight width={12} height={12} /></Button>
             </div>
             <ul>
               <AnimatePresence initial={false}>
@@ -218,7 +218,7 @@ export function Treasury() {
               <Bullet>Auto-rebalance to keep ≥ 1× monthly payroll liquid</Bullet>
               <Bullet>Daily yield, no lock-up</Bullet>
             </ul>
-            <Button variant="secondary" className="mt-5 w-full" onClick={() => toast('Rules saved (demo)', 'green')}>Configure rules</Button>
+            <Button variant="secondary" className="mt-5 w-full" onClick={() => toast('Auto-rebalance rules · coming soon')}>Configure rules</Button>
           </Card>
         </div>
       </div>

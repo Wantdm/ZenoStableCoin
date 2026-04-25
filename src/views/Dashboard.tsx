@@ -77,8 +77,9 @@ export function Dashboard() {
           </Card>
 
           <Card className="overflow-hidden">
-            <div className="border-b border-border-subtle px-6 py-4">
+            <div className="flex items-center justify-between border-b border-border-subtle px-6 py-4">
               <h3 className="text-[14.5px] font-semibold">Recent activity</h3>
+              <Button variant="ghost" size="sm" onClick={() => setView('transactions')}>View all <IconArrowRight width={12} height={12} /></Button>
             </div>
             <ul>
               {recent.map((a) => (
