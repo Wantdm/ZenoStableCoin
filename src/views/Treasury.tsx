@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Card, Pill, LiveDot, Button, CountUpNumber } from '../components/UI'
 import { treasury } from '../data'
-import { IconTrendUp, IconArrowRight, IconPlus, IconRefresh, IconSpinner } from '../components/Icons'
+import { IconTrendUp, IconArrowRight, IconPlus, IconRefresh, IconSpinner, IconBolt } from '../components/Icons'
 import { useApp, formatActivityDate } from '../context/AppContext'
 import { TopBar } from '../components/TopBar'
 
@@ -174,7 +174,7 @@ export function Treasury() {
                 >
                   <div className="flex items-center gap-3">
                     <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${a.amount >= 0 ? 'bg-brand-500/12 text-brand-500' : 'bg-white/[0.05] text-text-secondary'}`}>
-                      {a.amount >= 0 ? '+' : '−'}
+                      <ActivityIcon type={a.type} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 text-[13.5px] font-medium">
@@ -224,6 +224,16 @@ export function Treasury() {
       </div>
     </div>
   )
+}
+
+function ActivityIcon({ type }: { type: 'Payroll' | 'Yield' | 'Deposit' | 'Swap' }) {
+  const map = {
+    Payroll: <IconBolt width={14} height={14} />,
+    Yield: <IconTrendUp width={14} height={14} />,
+    Deposit: <IconPlus width={14} height={14} />,
+    Swap: <IconRefresh width={14} height={14} />,
+  }
+  return map[type]
 }
 
 function Bullet({ children }: { children: React.ReactNode }) {

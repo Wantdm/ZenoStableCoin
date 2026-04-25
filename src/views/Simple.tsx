@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Card, Pill, LiveDot, Avatar, MethodBadge, Button, CountUpNumber } from '../components/UI'
 import { useApp, formatActivityDate, Activity } from '../context/AppContext'
-import { IconPlus, IconDownload } from '../components/Icons'
+import { IconPlus, IconDownload, IconBolt, IconTrendUp, IconRefresh } from '../components/Icons'
 import { AnimatePresence, motion } from 'framer-motion'
 import { TopBar } from '../components/TopBar'
 
@@ -113,8 +113,8 @@ export function Transactions() {
                 className="grid grid-cols-[1fr_2fr_1fr_0.6fr] items-center border-b border-border-subtle px-6 py-3 last:border-b-0 overflow-hidden"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className={`flex h-6 w-6 items-center justify-center rounded-md text-[11px] ${a.amount >= 0 ? 'bg-brand-500/12 text-brand-500' : 'bg-white/[0.05] text-text-secondary'}`}>
-                    {a.amount >= 0 ? '+' : '−'}
+                  <span className={`flex h-6 w-6 items-center justify-center rounded-md ${a.amount >= 0 ? 'bg-brand-500/12 text-brand-500' : 'bg-white/[0.05] text-text-secondary'}`}>
+                    <ActivityIcon type={a.type} />
                   </span>
                   <span className="text-[13px]">{a.type}</span>
                 </div>
@@ -272,6 +272,16 @@ function Section({ title, children, actions }: { title: string; children: React.
       <div className="flex-1 overflow-auto px-8 py-7">{children}</div>
     </div>
   )
+}
+
+function ActivityIcon({ type }: { type: 'Payroll' | 'Yield' | 'Deposit' | 'Swap' }) {
+  const map = {
+    Payroll: <IconBolt width={12} height={12} />,
+    Yield: <IconTrendUp width={12} height={12} />,
+    Deposit: <IconPlus width={12} height={12} />,
+    Swap: <IconRefresh width={12} height={12} />,
+  }
+  return map[type]
 }
 
 function Mini({ label, value, tone = 'neutral' }: { label: string; value: React.ReactNode; tone?: 'neutral' | 'green' }) {
