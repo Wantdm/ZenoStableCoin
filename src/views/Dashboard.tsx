@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import { Card, Pill, LiveDot, Button, Avatar, MethodBadge, CountUpNumber } from '../components/UI'
 import { treasury } from '../data'
 import { IconTrendUp, IconArrowRight, IconBolt } from '../components/Icons'
@@ -115,6 +117,9 @@ function Sparkline() {
   const points = [40, 42, 48, 46, 55, 60, 58, 68, 72, 78, 82, 92]
   const w = 720, h = 160, pad = 8
   const max = Math.max(...points), min = Math.min(...points)
+  const lineRef = useRef<SVGPathElement>(null)
+  const [len, setLen] = useState(0)
+
   const path = points
     .map((p, i) => {
       const x = pad + (i * (w - pad * 2)) / (points.length - 1)
@@ -122,6 +127,11 @@ function Sparkline() {
       return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
     })
     .join(' ')
+
+  useEffect(() => {
+    if (lineRef.current) setLen(lineRef.current.getTotalLength())
+  }, [])
+
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="mt-5 w-full">
       <defs>
@@ -130,8 +140,24 @@ function Sparkline() {
           <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={`${path} L ${w - pad},${h - pad} L ${pad},${h - pad} Z`} fill="url(#dg)" />
-      <path d={path} stroke="#22c55e" strokeWidth="1.8" fill="none" />
+      <motion.path
+        d={`${path} L ${w - pad},${h - pad} L ${pad},${h - pad} Z`}
+        fill="url(#dg)"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.9, delay: 0.5 }}
+      />
+      <motion.path
+        ref={lineRef}
+        d={path}
+        stroke="#22c55e"
+        strokeWidth="1.8"
+        fill="none"
+        strokeDasharray={len}
+        initial={{ strokeDashoffset: len }}
+        animate={{ strokeDashoffset: 0 }}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
+      />
     </svg>
   )
 }
