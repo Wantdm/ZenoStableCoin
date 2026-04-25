@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card, Pill, LiveDot, Button, Avatar, MethodBadge, CountUpNumber } from '../components/UI'
 import { treasury } from '../data'
@@ -10,6 +10,14 @@ export function Dashboard() {
   const { team, setView, goToPayroll, treasuryBalance, treasuryYieldMtd, activity } = useApp()
   const monthly = team.reduce((s, m) => s + m.amount, 0)
   const recent = activity.slice(0, 4)
+  const nextPayroll = useMemo(() => {
+    const now = new Date()
+    const eom = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    const label = eom.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+    const days = Math.max(0, Math.ceil((eom.getTime() - now.getTime()) / 86_400_000))
+    const inLabel = days === 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`
+    return { label, inLabel }
+  }, [])
   return (
     <div className="flex h-full flex-col">
       <TopBar title="Dashboard">
@@ -42,7 +50,7 @@ export function Dashboard() {
           <Card className="p-6">
             <div className="text-[14.5px] font-semibold">Next payroll</div>
             <div className="mt-2 font-mono text-[28px] font-semibold tabular-nums">$<CountUpNumber target={monthly} /></div>
-            <div className="text-[12.5px] text-text-secondary">Scheduled · April 30</div>
+            <div className="text-[12.5px] text-text-secondary">Scheduled · {nextPayroll.label} <span className="text-text-muted">· {nextPayroll.inLabel}</span></div>
             <div className="mt-5 flex -space-x-2">
               {team.map((m) => (
                 <div key={m.id} className="ring-2 ring-bg-surface rounded-full"><Avatar initials={m.initials} color={m.avatarColor} size={28} /></div>
