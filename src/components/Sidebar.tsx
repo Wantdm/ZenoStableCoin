@@ -50,7 +50,7 @@ export function Sidebar() {
         <Logo />
       </button>
 
-      <nav className="flex-1 px-3">
+      <nav className="flex-1 px-3" aria-label="Primary">
         <SectionLabel>Main</SectionLabel>
         <ul className="space-y-0.5">
           {mainNav.map((item) => (
@@ -93,8 +93,10 @@ export function Sidebar() {
               exit={{ opacity: 0, y: 6 }}
               transition={{ duration: 0.14 }}
               className="absolute bottom-[74px] left-3 right-3 z-30 overflow-hidden rounded-xl border border-border-subtle bg-bg-elevated shadow-xl"
+              role="menu"
             >
               <button
+                role="menuitem"
                 className="block w-full px-3 py-2.5 text-left text-[13px] text-text-secondary transition-colors hover:bg-white/[0.04] hover:text-text-primary"
                 onClick={() => { setMenuOpen(false); toast('Only Acme Corp is set up in this demo') }}
               >
@@ -102,6 +104,7 @@ export function Sidebar() {
               </button>
               <div className="border-t border-border-subtle" />
               <button
+                role="menuitem"
                 className="block w-full px-3 py-2.5 text-left text-[13px] text-text-secondary transition-colors hover:bg-white/[0.04] hover:text-text-primary"
                 onClick={() => { setMenuOpen(false); toast('Signed out (demo)') }}
               >
@@ -113,6 +116,9 @@ export function Sidebar() {
 
         <button
           onClick={() => setMenuOpen((v) => !v)}
+          aria-haspopup="menu"
+          aria-expanded={menuOpen}
+          aria-label="Workspace menu"
           className="flex w-full items-center gap-3 rounded-xl border border-border-subtle bg-bg-elevated px-3 py-2.5 text-left transition-colors hover:border-border focus:outline-none focus:ring-2 focus:ring-brand-500/40"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-info-500 text-sm font-semibold text-white">AC</div>
@@ -146,6 +152,7 @@ function NavItem({ item, active, onClick, onPrefetch }: { item: { label: string;
         onClick={onClick}
         onMouseEnter={onPrefetch}
         onFocus={onPrefetch}
+        aria-current={active ? 'page' : undefined}
         className={[
           'group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500/30',
           active ? 'text-brand-400' : 'text-text-secondary hover:bg-white/[0.03] hover:text-text-primary',
