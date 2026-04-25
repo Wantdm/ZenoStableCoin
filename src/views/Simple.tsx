@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Card, Pill, LiveDot, Avatar, MethodBadge, Button, CountUpNumber } from '../components/UI'
-import { useApp } from '../context/AppContext'
+import { useApp, formatActivityDate, Activity } from '../context/AppContext'
 import { IconPlus, IconDownload } from '../components/Icons'
 import { AnimatePresence, motion } from 'framer-motion'
 import { TopBar } from '../components/TopBar'
@@ -43,7 +43,7 @@ export function Team() {
   )
 }
 
-const archiveTx = [
+const archiveTx: Activity[] = [
   { id: 'f', type: 'Payroll', detail: 'February payroll · 5 contractors', amount: -24200, date: 'Feb 28' },
   { id: 'g', type: 'Deposit', detail: 'Wire from Mercury · USDC', amount: 75000, date: 'Feb 12' },
   { id: 'h', type: 'Swap', detail: 'USDT → T-bill tokens', amount: -20000, date: 'Feb 05' },
@@ -104,7 +104,7 @@ export function Transactions() {
                 <div className={`text-right font-mono text-[13px] tabular-nums ${a.amount >= 0 ? 'text-brand-400' : 'text-text-primary'}`}>
                   {a.amount >= 0 ? '+' : '−'}${Math.abs(a.amount).toLocaleString()}
                 </div>
-                <div className="text-right text-[12.5px] text-text-muted">{a.date}</div>
+                <div className="text-right text-[12.5px] text-text-muted">{formatActivityDate(a)}</div>
               </motion.li>
             ))}
           </AnimatePresence>

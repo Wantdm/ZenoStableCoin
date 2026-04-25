@@ -12,6 +12,17 @@ export type Activity = {
   detail: string
   amount: number
   date: string
+  createdAt?: number
+}
+
+export function formatActivityDate(a: Activity, now: number = Date.now()): string {
+  if (!a.createdAt) return a.date
+  const elapsed = now - a.createdAt
+  if (elapsed < 5_000) return 'Just now'
+  if (elapsed < 60_000) return `${Math.floor(elapsed / 1000)}s ago`
+  if (elapsed < 3_600_000) return `${Math.floor(elapsed / 60_000)}m ago`
+  if (elapsed < 86_400_000) return `${Math.floor(elapsed / 3_600_000)}h ago`
+  return a.date
 }
 
 type Ctx = {
@@ -187,7 +198,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addTransaction = useCallback((tx: Omit<Activity, 'id'> & { id?: string }) => {
     const id = tx.id ?? String(Date.now()) + Math.random().toString(36).slice(2, 6)
-    setActivity((a) => [{ ...tx, id }, ...a])
+    const createdAt = tx.createdAt ?? Date.now()
+    setActivity((a) => [{ ...tx, id, createdAt }, ...a])
     balanceTargetRef.current = Math.max(0, balanceTargetRef.current + tx.amount)
     setTreasuryBalance((b) => Math.max(0, b + tx.amount))
   }, [])

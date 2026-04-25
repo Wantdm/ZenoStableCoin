@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Card, Pill, LiveDot, Button, CountUpNumber } from '../components/UI'
 import { treasury } from '../data'
 import { IconTrendUp, IconArrowRight, IconPlus, IconRefresh, IconSpinner } from '../components/Icons'
-import { useApp } from '../context/AppContext'
+import { useApp, formatActivityDate } from '../context/AppContext'
 import { TopBar } from '../components/TopBar'
 
 export function Treasury() {
@@ -200,7 +200,7 @@ export function Treasury() {
                     <span className={`font-mono text-[13.5px] tabular-nums ${a.amount >= 0 ? 'text-brand-400' : 'text-text-primary'}`}>
                       {a.amount >= 0 ? '+' : '−'}${Math.abs(a.amount).toLocaleString()}
                     </span>
-                    <span className="w-12 text-right text-[12px] text-text-muted">{a.date}</span>
+                    <span className="w-16 text-right text-[12px] text-text-muted">{formatActivityDate(a)}</span>
                   </div>
                 </motion.li>
               ))}

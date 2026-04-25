@@ -1,7 +1,7 @@
 import { Card, Pill, LiveDot, Button, Avatar, MethodBadge, CountUpNumber } from '../components/UI'
 import { treasury } from '../data'
 import { IconTrendUp, IconArrowRight, IconBolt } from '../components/Icons'
-import { useApp } from '../context/AppContext'
+import { useApp, formatActivityDate } from '../context/AppContext'
 import { TopBar } from '../components/TopBar'
 
 export function Dashboard() {
@@ -85,7 +85,7 @@ export function Dashboard() {
                 <li key={a.id} className="flex items-center justify-between border-b border-border-subtle px-6 py-3 last:border-b-0">
                   <div>
                     <div className="text-[13px] font-medium">{a.type}</div>
-                    <div className="text-[11.5px] text-text-muted">{a.date}</div>
+                    <div className="text-[11.5px] text-text-muted">{formatActivityDate(a)}</div>
                   </div>
                   <div className={`font-mono text-[13px] tabular-nums ${a.amount >= 0 ? 'text-brand-400' : 'text-text-primary'}`}>
                     {a.amount >= 0 ? '+' : '−'}${Math.abs(a.amount).toLocaleString()}
