@@ -1,10 +1,18 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from 'react'
-import { team as seedTeam, Member, Method } from '../data'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode } from 'react'
+import { team as seedTeam, treasury as seedTreasury, recentActivity as seedActivity, Member, Method } from '../data'
 
 export type View = 'dashboard' | 'payroll' | 'treasury' | 'team' | 'transactions' | 'reports' | 'settings'
 export type Route = 'landing' | 'app'
 
 type Toast = { id: number; msg: string; tone?: 'neutral' | 'green' }
+
+export type Activity = {
+  id: string
+  type: 'Payroll' | 'Yield' | 'Deposit' | 'Swap'
+  detail: string
+  amount: number
+  date: string
+}
 
 type Ctx = {
   route: Route
@@ -23,6 +31,12 @@ type Ctx = {
   setPayrollStep: (s: 0 | 1 | 2) => void
   authorized: boolean
   setAuthorized: (v: boolean) => void
+  isExecuting: boolean
+
+  treasuryBalance: number
+  treasuryYieldMtd: number
+  activity: Activity[]
+  addTransaction: (tx: Omit<Activity, 'id'> & { id?: string }) => void
 
   toasts: Toast[]
   toast: (msg: string, tone?: 'neutral' | 'green') => void
@@ -61,11 +75,42 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(false)
   const [toasts, setToasts] = useState<Toast[]>([])
 
+  const [treasuryBalance, setTreasuryBalance] = useState(seedTreasury.balance)
+  const [treasuryYieldMtd, setTreasuryYieldMtd] = useState(seedTreasury.yieldMtd)
+  const [activity, setActivity] = useState<Activity[]>(seedActivity as Activity[])
+  const balanceTargetRef = useRef(seedTreasury.balance)
+
   useEffect(() => {
     try {
       window.localStorage.setItem('zeno.team', JSON.stringify(team))
     } catch {}
   }, [team])
+
+  // Random-walk treasury balance toward a moving target every 3–5s
+  useEffect(() => {
+    let timer: number
+    const schedule = () => {
+      const delay = 3000 + Math.random() * 2000
+      timer = window.setTimeout(() => {
+        setTreasuryBalance((b) => {
+          const drift = (Math.random() - 0.5) * 100
+          const target = balanceTargetRef.current + (Math.random() - 0.5) * 100
+          return Math.round((b + (target - b) * 0.6 + drift * 0.2) * 100) / 100
+        })
+        schedule()
+      }, delay)
+    }
+    schedule()
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Yield ticks every 12s — visible during a demo
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setTreasuryYieldMtd((v) => Math.round((v + 0.5 + Math.random() * 1.5) * 100) / 100)
+    }, 12000)
+    return () => clearInterval(id)
+  }, [])
 
   const navigate = useCallback((r: Route) => {
     setRoute(r)
@@ -129,6 +174,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTeam((t) => t.filter((m) => m.id !== id))
   }, [])
 
+  const addTransaction = useCallback((tx: Omit<Activity, 'id'> & { id?: string }) => {
+    const id = tx.id ?? String(Date.now()) + Math.random().toString(36).slice(2, 6)
+    setActivity((a) => [{ ...tx, id }, ...a])
+    balanceTargetRef.current = Math.max(0, balanceTargetRef.current + tx.amount)
+    setTreasuryBalance((b) => Math.max(0, b + tx.amount))
+  }, [])
+
   const toast = useCallback((msg: string, tone: 'neutral' | 'green' = 'neutral') => {
     const id = Date.now() + Math.random()
     setToasts((ts) => [...ts, { id, msg, tone }])
@@ -145,6 +197,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTeam(seedTeam)
     setPayrollStep(0)
     setAuthorized(false)
+    setActivity(seedActivity as Activity[])
+    setTreasuryBalance(seedTreasury.balance)
+    setTreasuryYieldMtd(seedTreasury.yieldMtd)
+    balanceTargetRef.current = seedTreasury.balance
     try {
       window.localStorage.removeItem('zeno.team')
     } catch {}
@@ -159,13 +215,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  const isExecuting = view === 'payroll' && payrollStep === 2
+
   const value = useMemo<Ctx>(() => ({
     route, navigate, view, setView, goToPayroll,
     team, setAmount, addMember, updateMember, removeMember,
-    payrollStep, setPayrollStep, authorized, setAuthorized,
+    payrollStep, setPayrollStep, authorized, setAuthorized, isExecuting,
+    treasuryBalance, treasuryYieldMtd, activity, addTransaction,
     toasts, toast, dismissToast,
     resetDemo,
-  }), [route, navigate, view, setView, goToPayroll, team, setAmount, addMember, updateMember, removeMember, payrollStep, authorized, toasts, toast, dismissToast, resetDemo])
+  }), [route, navigate, view, setView, goToPayroll, team, setAmount, addMember, updateMember, removeMember, payrollStep, authorized, isExecuting, treasuryBalance, treasuryYieldMtd, activity, addTransaction, toasts, toast, dismissToast, resetDemo])
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>
 }

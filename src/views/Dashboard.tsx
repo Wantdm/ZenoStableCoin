@@ -1,12 +1,13 @@
 import { Card, Pill, LiveDot, Button, Avatar, MethodBadge, CountUpNumber } from '../components/UI'
-import { treasury, recentActivity } from '../data'
+import { treasury } from '../data'
 import { IconTrendUp, IconArrowRight, IconBolt } from '../components/Icons'
 import { useApp } from '../context/AppContext'
 import { TopBar } from '../components/TopBar'
 
 export function Dashboard() {
-  const { team, setView, goToPayroll } = useApp()
+  const { team, setView, goToPayroll, treasuryBalance, treasuryYieldMtd, activity } = useApp()
   const monthly = team.reduce((s, m) => s + m.amount, 0)
+  const recent = activity.slice(0, 4)
   return (
     <div className="flex h-full flex-col">
       <TopBar title="Dashboard">
@@ -18,7 +19,7 @@ export function Dashboard() {
 
       <div className="flex-1 overflow-auto px-8 py-7">
         <div className="grid grid-cols-4 gap-4">
-          <Stat label="Treasury balance" valueEl={<>$<CountUpNumber target={treasury.balance} /></>} sub={`+$${treasury.yieldMtd.toLocaleString()} MTD`} subTone="green" />
+          <Stat label="Treasury balance" valueEl={<>${Math.round(treasuryBalance).toLocaleString()}</>} sub={`+$${Math.round(treasuryYieldMtd).toLocaleString()} MTD`} subTone="green" />
           <Stat label="Yield (APY)" valueEl={<><CountUpNumber target={treasury.apy} decimals={1} durationMs={900} />%</>} sub="Auto-compounded" />
           <Stat label="Monthly payroll" valueEl={<>$<CountUpNumber target={monthly} /></>} sub={`${team.length} contractor${team.length === 1 ? '' : 's'}`} />
           <Stat label="Avg settlement" valueEl={<>&lt; 3 min</>} sub="0.2% fee" subTone="green" />
@@ -80,7 +81,7 @@ export function Dashboard() {
               <h3 className="text-[14.5px] font-semibold">Recent activity</h3>
             </div>
             <ul>
-              {recentActivity.slice(0, 4).map((a) => (
+              {recent.map((a) => (
                 <li key={a.id} className="flex items-center justify-between border-b border-border-subtle px-6 py-3 last:border-b-0">
                   <div>
                     <div className="text-[13px] font-medium">{a.type}</div>

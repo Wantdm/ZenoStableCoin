@@ -457,7 +457,7 @@ const TOTAL_DURATION_MS = 6200 // compressed screen time
 const REAL_TIME_END = 28 // T+28s shown to user
 
 function StepExecute() {
-  const { team, setView, goToPayroll } = useApp()
+  const { team, setView, goToPayroll, addTransaction } = useApp()
   const total = useMemo(() => team.reduce((s, m) => s + m.amount, 0), [team])
 
   const [elapsedMs, setElapsedMs] = useState(0)
@@ -490,6 +490,12 @@ function StepExecute() {
         if (!firedConfettiRef.current) {
           firedConfettiRef.current = true
           fireConfetti()
+          addTransaction({
+            type: 'Payroll',
+            detail: `April payroll · ${team.length} contractor${team.length === 1 ? '' : 's'}`,
+            amount: -total,
+            date: 'Today',
+          })
         }
       }
     }

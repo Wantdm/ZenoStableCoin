@@ -1,52 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Card, Pill, LiveDot, Button, CountUpNumber } from '../components/UI'
-import { treasury, recentActivity } from '../data'
+import { treasury } from '../data'
 import { IconTrendUp, IconArrowRight, IconPlus, IconRefresh, IconSpinner } from '../components/Icons'
 import { useApp } from '../context/AppContext'
 import { TopBar } from '../components/TopBar'
 
 export function Treasury() {
-  const { goToPayroll, toast } = useApp()
-  const [balance, setBalance] = useState(treasury.balance)
+  const { goToPayroll, toast, treasuryBalance: balance, treasuryYieldMtd: yieldMtd, activity } = useApp()
   const [flash, setFlash] = useState<'up' | 'down' | null>(null)
-  const [yieldMtd, setYieldMtd] = useState(treasury.yieldMtd)
   const [showNewBadge, setShowNewBadge] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const prevBalanceRef = useRef(balance)
+  const recent = activity.slice(0, 5)
 
-  // Random-walk the balance every 3–5s, ±$50 from the base
+  // Drive flash from balance changes (no key remount → smooth color animation)
   useEffect(() => {
-    let timer: number
-    const schedule = () => {
-      const delay = 3000 + Math.random() * 2000
-      timer = window.setTimeout(() => {
-        setBalance((b) => {
-          const drift = (Math.random() - 0.5) * 100 // +/- $50
-          const target = treasury.balance + (Math.random() - 0.5) * 100
-          const next = Math.round((b + (target - b) * 0.6 + drift * 0.2) * 100) / 100
-          setFlash(next >= b ? 'up' : 'down')
-          return next
-        })
-        schedule()
-      }, delay)
-    }
-    schedule()
-    return () => clearTimeout(timer)
-  }, [])
+    const prev = prevBalanceRef.current
+    if (balance > prev) setFlash('up')
+    else if (balance < prev) setFlash('down')
+    prevBalanceRef.current = balance
+  }, [balance])
 
   useEffect(() => {
     if (!flash) return
     const t = window.setTimeout(() => setFlash(null), 700)
     return () => clearTimeout(t)
   }, [flash])
-
-  // Yield MTD ticks up once per minute — for demo, use 12s so it's visible
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      setYieldMtd((v) => Math.round((v + 0.5 + Math.random() * 1.5) * 100) / 100)
-    }, 12000)
-    return () => clearInterval(id)
-  }, [])
 
   // "NEW" badge fades after 5s
   useEffect(() => {
@@ -77,9 +57,9 @@ export function Treasury() {
             <div className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted">Treasury balance</div>
             <div className="mt-2 flex items-baseline gap-3">
               <motion.span
-                key={flash}
+                initial={false}
                 animate={{ color: flash === 'up' ? '#3bd77a' : flash === 'down' ? '#fca5a5' : '#e7e9ec' }}
-                transition={{ duration: 0.7 }}
+                transition={{ duration: 0.7, ease: 'easeOut' }}
                 className="font-mono text-[40px] font-semibold tabular-nums tracking-tight"
               >
                 ${Math.round(balance).toLocaleString()}
@@ -134,9 +114,15 @@ export function Treasury() {
 
           <Card className="p-6">
             <div className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted">Yield · this month</div>
-            <div className="mt-2 font-mono text-[28px] font-semibold tabular-nums text-brand-400">
-              +$<CountUpNumber target={treasury.yieldMtd} decimals={0} durationMs={1200} />
-            </div>
+            <motion.div
+              key={Math.floor(yieldMtd)}
+              initial={{ opacity: 0.7 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+              className="mt-2 font-mono text-[28px] font-semibold tabular-nums text-brand-400"
+            >
+              +${yieldMtd.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            </motion.div>
             <div className="mt-1 text-[12.5px] text-text-secondary">{treasury.apy}% APY · auto-compounded</div>
 
             <div className="mt-6">
@@ -175,8 +161,17 @@ export function Treasury() {
               <Button variant="ghost" size="sm">View all <IconArrowRight width={12} height={12} /></Button>
             </div>
             <ul>
-              {recentActivity.map((a, i) => (
-                <li key={a.id} className="flex items-center justify-between border-b border-border-subtle px-6 py-3.5 last:border-b-0">
+              <AnimatePresence initial={false}>
+              {recent.map((a, i) => (
+                <motion.li
+                  key={a.id}
+                  layout
+                  initial={{ opacity: 0, height: 0, y: -8 }}
+                  animate={{ opacity: 1, height: 'auto', y: 0 }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.28 }}
+                  className="flex items-center justify-between border-b border-border-subtle px-6 py-3.5 last:border-b-0 overflow-hidden"
+                >
                   <div className="flex items-center gap-3">
                     <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${a.amount >= 0 ? 'bg-brand-500/12 text-brand-500' : 'bg-white/[0.05] text-text-secondary'}`}>
                       {a.amount >= 0 ? '+' : '−'}
@@ -207,8 +202,9 @@ export function Treasury() {
                     </span>
                     <span className="w-12 text-right text-[12px] text-text-muted">{a.date}</span>
                   </div>
-                </li>
+                </motion.li>
               ))}
+              </AnimatePresence>
             </ul>
           </Card>
 

@@ -1,8 +1,8 @@
+import { useMemo } from 'react'
 import { Card, Pill, LiveDot, Avatar, MethodBadge, Button, CountUpNumber } from '../components/UI'
-import { recentActivity } from '../data'
 import { useApp } from '../context/AppContext'
 import { IconPlus, IconDownload } from '../components/Icons'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { TopBar } from '../components/TopBar'
 
 export function Team() {
@@ -43,8 +43,7 @@ export function Team() {
   )
 }
 
-const extendedTx = [
-  ...recentActivity,
+const archiveTx = [
   { id: 'f', type: 'Payroll', detail: 'February payroll · 5 contractors', amount: -24200, date: 'Feb 28' },
   { id: 'g', type: 'Deposit', detail: 'Wire from Mercury · USDC', amount: 75000, date: 'Feb 12' },
   { id: 'h', type: 'Swap', detail: 'USDT → T-bill tokens', amount: -20000, date: 'Feb 05' },
@@ -53,7 +52,14 @@ const extendedTx = [
 ]
 
 export function Transactions() {
-  const { toast } = useApp()
+  const { toast, activity } = useApp()
+  const allTx = useMemo(() => [...activity, ...archiveTx], [activity])
+  const totals = useMemo(() => {
+    const inSum = allTx.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0)
+    const outSum = allTx.filter((t) => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0)
+    const yieldSum = allTx.filter((t) => t.type === 'Yield').reduce((s, t) => s + t.amount, 0)
+    return { inSum, outSum, yieldSum }
+  }, [allTx])
   return (
     <Section
       title="Transactions"
@@ -66,10 +72,10 @@ export function Transactions() {
       }
     >
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <Mini label="Total in" value={<>$<CountUpNumber target={125000} /></>} />
-        <Mini label="Total out" value={<>$<CountUpNumber target={98700} /></>} tone="neutral" />
-        <Mini label="Yield earned" value={<>$<CountUpNumber target={1757} /></>} tone="green" />
-        <Mini label="Transactions" value={<CountUpNumber target={extendedTx.length} />} />
+        <Mini label="Total in" value={<>$<CountUpNumber target={totals.inSum} /></>} />
+        <Mini label="Total out" value={<>$<CountUpNumber target={totals.outSum} /></>} tone="neutral" />
+        <Mini label="Yield earned" value={<>$<CountUpNumber target={totals.yieldSum} /></>} tone="green" />
+        <Mini label="Transactions" value={<CountUpNumber target={allTx.length} />} />
       </div>
 
       <Card className="overflow-hidden">
@@ -77,27 +83,31 @@ export function Transactions() {
           <div>Type</div><div>Detail</div><div className="text-right">Amount</div><div className="text-right">Date</div>
         </div>
         <ul>
-          {extendedTx.map((a, i) => (
-            <motion.li
-              key={a.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2, delay: i * 0.02 }}
-              className="grid grid-cols-[1fr_2fr_1fr_0.6fr] items-center border-b border-border-subtle px-6 py-3 last:border-b-0"
-            >
-              <div className="flex items-center gap-2.5">
-                <span className={`flex h-6 w-6 items-center justify-center rounded-md text-[11px] ${a.amount >= 0 ? 'bg-brand-500/12 text-brand-500' : 'bg-white/[0.05] text-text-secondary'}`}>
-                  {a.amount >= 0 ? '+' : '−'}
-                </span>
-                <span className="text-[13px]">{a.type}</span>
-              </div>
-              <div className="text-[13px] text-text-secondary">{a.detail}</div>
-              <div className={`text-right font-mono text-[13px] tabular-nums ${a.amount >= 0 ? 'text-brand-400' : 'text-text-primary'}`}>
-                {a.amount >= 0 ? '+' : '−'}${Math.abs(a.amount).toLocaleString()}
-              </div>
-              <div className="text-right text-[12.5px] text-text-muted">{a.date}</div>
-            </motion.li>
-          ))}
+          <AnimatePresence initial={false}>
+            {allTx.map((a, i) => (
+              <motion.li
+                key={a.id}
+                layout
+                initial={{ opacity: 0, height: 0, y: -6 }}
+                animate={{ opacity: 1, height: 'auto', y: 0 }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.22, delay: Math.min(i * 0.015, 0.2) }}
+                className="grid grid-cols-[1fr_2fr_1fr_0.6fr] items-center border-b border-border-subtle px-6 py-3 last:border-b-0 overflow-hidden"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className={`flex h-6 w-6 items-center justify-center rounded-md text-[11px] ${a.amount >= 0 ? 'bg-brand-500/12 text-brand-500' : 'bg-white/[0.05] text-text-secondary'}`}>
+                    {a.amount >= 0 ? '+' : '−'}
+                  </span>
+                  <span className="text-[13px]">{a.type}</span>
+                </div>
+                <div className="text-[13px] text-text-secondary">{a.detail}</div>
+                <div className={`text-right font-mono text-[13px] tabular-nums ${a.amount >= 0 ? 'text-brand-400' : 'text-text-primary'}`}>
+                  {a.amount >= 0 ? '+' : '−'}${Math.abs(a.amount).toLocaleString()}
+                </div>
+                <div className="text-right text-[12.5px] text-text-muted">{a.date}</div>
+              </motion.li>
+            ))}
+          </AnimatePresence>
         </ul>
       </Card>
     </Section>
