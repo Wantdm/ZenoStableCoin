@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Card, Pill, LiveDot, Avatar, MethodBadge, Button, CountUpNumber } from '../components/UI'
 import { useApp, formatActivityDate, Activity } from '../context/AppContext'
 import { IconPlus, IconDownload, IconBolt, IconTrendUp, IconRefresh } from '../components/Icons'
@@ -258,10 +258,37 @@ export function Settings() {
   const { toast, resetDemo, isExecuting } = useApp()
   const apiKey = 'zk_live_3c9f8e2a4b6d7f1c5e8a9b0d2f4a6c8e'
   const masked = `${apiKey.slice(0, 12)}${'•'.repeat(20)}${apiKey.slice(-4)}`
+  const [armed, setArmed] = useState(false)
+  const armTimerRef = useRef<number | null>(null)
+
+  useEffect(() => () => {
+    if (armTimerRef.current) clearTimeout(armTimerRef.current)
+  }, [])
 
   const copy = (label: string, value: string) => {
     navigator.clipboard?.writeText(value).catch(() => {})
     toast(`${label} copied`, 'green')
+  }
+
+  const armReset = () => {
+    if (isExecuting) {
+      toast('Wait for payroll to finish before resetting')
+      return
+    }
+    setArmed(true)
+    if (armTimerRef.current) clearTimeout(armTimerRef.current)
+    armTimerRef.current = window.setTimeout(() => setArmed(false), 4000)
+  }
+
+  const cancelReset = () => {
+    setArmed(false)
+    if (armTimerRef.current) clearTimeout(armTimerRef.current)
+  }
+
+  const confirmReset = () => {
+    setArmed(false)
+    if (armTimerRef.current) clearTimeout(armTimerRef.current)
+    resetDemo()
   }
 
   return (
@@ -297,13 +324,33 @@ export function Settings() {
               <div className="text-[13px] font-medium text-text-primary">Reset demo state</div>
               <div className="text-[12px] text-text-muted">Restores seed team, balance, and activity feed.</div>
             </div>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={() => isExecuting ? toast('Wait for payroll to finish before resetting') : resetDemo()}
-            >
-              Reset
-            </Button>
+            <AnimatePresence mode="wait" initial={false}>
+              {armed ? (
+                <motion.div
+                  key="armed"
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.12 }}
+                  className="flex items-center gap-2"
+                >
+                  <Button variant="ghost" size="sm" onClick={cancelReset}>Cancel</Button>
+                  <Button variant="danger" size="sm" onClick={confirmReset}>Confirm reset</Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="idle"
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.12 }}
+                >
+                  <Button variant="danger" size="sm" onClick={armReset} disabled={isExecuting}>
+                    Reset
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </SettingCard>
       </div>
