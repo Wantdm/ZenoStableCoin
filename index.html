@@ -26,8 +26,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
-  <body>
-    <div id="root"></div>
+  <body style="margin:0;background:#0a0b0d;color:#e7e9ec;font-family:Inter,system-ui,sans-serif">
+    <div id="root">
+      <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center">
+        <div style="display:flex;align-items:center;gap:12px;opacity:0;animation:zenoFade 0.35s ease-out 0.25s forwards">
+          <div style="width:32px;height:32px;border-radius:8px;background:#22c55e;display:flex;align-items:center;justify-content:center">
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="#0a0b0d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10h12l-9 12h9"/></svg>
+          </div>
+          <span style="font-size:15px;font-weight:500;letter-spacing:-0.2px">Loading Zeno…</span>
+        </div>
+      </div>
+      <style>@keyframes zenoFade{to{opacity:1}}</style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
