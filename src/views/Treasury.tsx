@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Card, Pill, LiveDot, Button, CountUpNumber } from '../components/UI'
 import { treasury } from '../data'
@@ -13,6 +13,14 @@ export function Treasury() {
   const [refreshing, setRefreshing] = useState(false)
   const prevBalanceRef = useRef(balance)
   const recent = activity.slice(0, 5)
+
+  const { ytdProjected, avgApy } = useMemo(() => {
+    const now = new Date()
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+    const monthsElapsed = now.getMonth() + now.getDate() / daysInMonth
+    const ytd = Math.round((balance * (treasury.apy / 100) * monthsElapsed) / 12)
+    return { ytdProjected: ytd, avgApy: (treasury.apy - 0.08).toFixed(2) }
+  }, [balance])
 
   // Drive flash from balance changes (no key remount → smooth color animation)
   useEffect(() => {
@@ -133,12 +141,12 @@ export function Treasury() {
               <div className="rounded-lg bg-bg-elevated px-3 py-2.5">
                 <div className="text-text-muted">Projected · YTD</div>
                 <div className="mt-1 font-mono font-semibold">
-                  $<CountUpNumber target={5128} durationMs={1400} when="inView" />
+                  $<CountUpNumber target={ytdProjected} durationMs={1400} when="inView" />
                 </div>
               </div>
               <div className="rounded-lg bg-bg-elevated px-3 py-2.5">
                 <div className="text-text-muted">Avg APY</div>
-                <div className="mt-1 font-mono font-semibold">4.42%</div>
+                <div className="mt-1 font-mono font-semibold">{avgApy}%</div>
               </div>
             </div>
           </Card>
