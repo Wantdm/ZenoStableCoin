@@ -16,6 +16,7 @@ export function CommandPalette() {
   const [idx, setIdx] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
+  const lastFocusedRef = useRef<HTMLElement | null>(null)
 
   const actions = useMemo<Action[]>(() => {
     const goView = (v: View, label: string, shortcutKey: string): Action => ({
@@ -69,9 +70,16 @@ export function CommandPalette() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open, setOpen])
 
-  // Reset state on open + focus input
+  // Reset state on open + focus input. On close, return focus to whatever
+  // was focused before — keeps keyboard users oriented.
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      const prev = lastFocusedRef.current
+      lastFocusedRef.current = null
+      if (prev && document.body.contains(prev)) prev.focus()
+      return
+    }
+    lastFocusedRef.current = (document.activeElement as HTMLElement) ?? null
     setQuery('')
     setIdx(0)
     const t = window.setTimeout(() => inputRef.current?.focus(), 30)
