@@ -135,6 +135,26 @@ export function Transactions() {
 export function Reports() {
   const { team, activity, toast } = useApp()
 
+  const period = useMemo(() => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const monthLong = now.toLocaleDateString('en-US', { month: 'long' })
+    const monthShort = now.toLocaleDateString('en-US', { month: 'short' })
+    const eom = new Date(year, now.getMonth() + 1, 0).getDate()
+    const monthRange = `${monthShort} 1 – ${monthShort} ${eom}, ${year}`
+
+    const q = Math.floor(now.getMonth() / 3)
+    const lastQ = q === 0 ? 3 : q - 1
+    const lastQYear = q === 0 ? year - 1 : year
+    const qStartMonth = lastQ * 3
+    const qEnd = new Date(lastQYear, qStartMonth + 3, 0)
+    const qShort = ['Q1', 'Q2', 'Q3', 'Q4'][lastQ]
+    const startName = new Date(lastQYear, qStartMonth, 1).toLocaleDateString('en-US', { month: 'short' })
+    const endName = qEnd.toLocaleDateString('en-US', { month: 'short' })
+    const qRange = `${startName} 1 – ${endName} ${qEnd.getDate()}, ${lastQYear}`
+    return { year, monthLong, monthRange, qLabel: `${qShort} ${lastQYear}`, qRange, qFile: `${qShort.toLowerCase()}-${lastQYear}`, monthFile: monthLong.toLowerCase() }
+  }, [])
+
   const downloadCsv = (filename: string, rows: (string | number)[][]) => {
     const escape = (v: string) => /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v
     const csv = rows.map((r) => r.map((c) => escape(String(c))).join(',')).join('\n')
@@ -155,27 +175,27 @@ export function Reports() {
       id: `1099-${m.id}`,
       name: `1099-NEC · ${m.name || 'Unnamed'}`,
       kind: '1099-NEC',
-      period: 'Tax year 2026 · YTD',
+      period: `Tax year ${period.year} · YTD`,
       ready: true as const,
       onDownload: () => downloadCsv(
-        `1099-${(m.name || 'unnamed').replace(/\s+/g, '-').toLowerCase()}-2026.csv`,
+        `1099-${(m.name || 'unnamed').replace(/\s+/g, '-').toLowerCase()}-${period.year}.csv`,
         [
           ['Form', 'Recipient', 'Country', 'Method', 'YTD Payments (USD)', 'Tax year'],
-          ['1099-NEC', m.name || 'Unnamed', m.country, m.method, (m.amount * 4).toFixed(2), 2026],
+          ['1099-NEC', m.name || 'Unnamed', m.country, m.method, (m.amount * 4).toFixed(2), period.year],
         ],
       ),
     })),
     {
-      id: 'pl-q1',
-      name: 'Q1 2026 · P&L summary',
+      id: 'pl-q',
+      name: `${period.qLabel} · P&L summary`,
       kind: 'P&L',
-      period: 'Jan 1 – Mar 31, 2026',
+      period: period.qRange,
       ready: true as const,
       onDownload: () => {
         const inSum = activity.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0)
         const outSum = activity.filter((t) => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0)
         const yieldSum = activity.filter((t) => t.type === 'Yield').reduce((s, t) => s + t.amount, 0)
-        downloadCsv('zeno-pl-q1-2026.csv', [
+        downloadCsv(`zeno-pl-${period.qFile}.csv`, [
           ['Metric', 'Value (USD)'],
           ['Total inflows', inSum.toFixed(2)],
           ['Total outflows', outSum.toFixed(2)],
@@ -186,11 +206,11 @@ export function Reports() {
     },
     {
       id: 'treasury-stmt',
-      name: 'Treasury statement · April',
+      name: `Treasury statement · ${period.monthLong}`,
       kind: 'Statement',
-      period: 'Apr 1 – Apr 30, 2026',
+      period: period.monthRange,
       ready: true as const,
-      onDownload: () => downloadCsv('zeno-treasury-apr-2026.csv', [
+      onDownload: () => downloadCsv(`zeno-treasury-${period.monthFile}-${period.year}.csv`, [
         ['Date', 'Type', 'Detail', 'Amount (USD)'],
         ...activity.map((t) => [t.date, t.type, t.detail, t.amount.toFixed(2)]),
       ]),
@@ -199,7 +219,7 @@ export function Reports() {
       id: 'country-tax-br',
       name: 'Brazil · contractor tax filing',
       kind: 'Country form',
-      period: 'Q1 2026',
+      period: period.qLabel,
       ready: false as const,
       onDownload: () => toast('Brazil filing — generating in background, ETA 30s'),
     },
@@ -207,7 +227,7 @@ export function Reports() {
       id: 'country-tax-in',
       name: 'India · contractor tax filing',
       kind: 'Country form',
-      period: 'Q1 2026',
+      period: period.qLabel,
       ready: false as const,
       onDownload: () => toast('India filing — generating in background, ETA 30s'),
     },

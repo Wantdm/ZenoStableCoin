@@ -520,9 +520,10 @@ function StepExecute() {
         if (!firedConfettiRef.current) {
           firedConfettiRef.current = true
           fireConfetti()
+          const monthName = new Date().toLocaleDateString('en-US', { month: 'long' })
           addTransaction({
             type: 'Payroll',
-            detail: `April payroll · ${team.length} contractor${team.length === 1 ? '' : 's'}`,
+            detail: `${monthName} payroll · ${team.length} contractor${team.length === 1 ? '' : 's'}`,
             amount: -total,
             date: 'Today',
           })
