@@ -1,15 +1,23 @@
-import { useEffect, useRef } from 'react'
+import { Suspense, lazy, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AppProvider, useApp, View } from './context/AppContext'
 import { Sidebar } from './components/Sidebar'
 import { ToastHost } from './components/Toast'
 import { CommandPalette } from './components/CommandPalette'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { Landing } from './views/Landing'
-import { Dashboard } from './views/Dashboard'
-import { Payroll } from './views/Payroll'
-import { Treasury } from './views/Treasury'
-import { Team, Transactions, Reports, Settings } from './views/Simple'
+
+const Landing = lazy(() => import('./views/Landing').then((m) => ({ default: m.Landing })))
+const Dashboard = lazy(() => import('./views/Dashboard').then((m) => ({ default: m.Dashboard })))
+const Payroll = lazy(() => import('./views/Payroll').then((m) => ({ default: m.Payroll })))
+const Treasury = lazy(() => import('./views/Treasury').then((m) => ({ default: m.Treasury })))
+const Team = lazy(() => import('./views/Simple').then((m) => ({ default: m.Team })))
+const Transactions = lazy(() => import('./views/Simple').then((m) => ({ default: m.Transactions })))
+const Reports = lazy(() => import('./views/Simple').then((m) => ({ default: m.Reports })))
+const Settings = lazy(() => import('./views/Simple').then((m) => ({ default: m.Settings })))
+
+function ViewFallback() {
+  return <div className="h-full bg-bg-base" />
+}
 
 const navMap: Record<string, View> = {
   d: 'dashboard',
@@ -65,7 +73,9 @@ function Shell() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <Landing />
+          <Suspense fallback={<div className="h-screen bg-bg-base" />}>
+            <Landing />
+          </Suspense>
         </motion.div>
       ) : (
         <motion.div
@@ -87,13 +97,15 @@ function Shell() {
                 transition={{ duration: 0.18 }}
                 className="h-full"
               >
-                {view === 'dashboard' && <Dashboard />}
-                {view === 'payroll' && <Payroll />}
-                {view === 'treasury' && <Treasury />}
-                {view === 'team' && <Team />}
-                {view === 'transactions' && <Transactions />}
-                {view === 'reports' && <Reports />}
-                {view === 'settings' && <Settings />}
+                <Suspense fallback={<ViewFallback />}>
+                  {view === 'dashboard' && <Dashboard />}
+                  {view === 'payroll' && <Payroll />}
+                  {view === 'treasury' && <Treasury />}
+                  {view === 'team' && <Team />}
+                  {view === 'transactions' && <Transactions />}
+                  {view === 'reports' && <Reports />}
+                  {view === 'settings' && <Settings />}
+                </Suspense>
               </motion.div>
             </AnimatePresence>
           </main>
