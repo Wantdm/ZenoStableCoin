@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Logo } from './Logo'
 import { IconDashboard, IconPayroll, IconTreasury, IconTeam, IconTx, IconReports, IconSettings, IconChevronDown } from './Icons'
 import { useApp, View } from '../context/AppContext'
+import { preloadView } from '../preload'
 
 const mainNav: { id: View; label: string; icon: React.FC<any>; badge?: string }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: IconDashboard },
@@ -53,14 +54,14 @@ export function Sidebar() {
         <SectionLabel>Main</SectionLabel>
         <ul className="space-y-0.5">
           {mainNav.map((item) => (
-            <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} />
+            <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} onPrefetch={() => preloadView[item.id]()} />
           ))}
         </ul>
 
         <SectionLabel className="mt-7">Finance</SectionLabel>
         <ul className="space-y-0.5">
           {financeNav.map((item) => (
-            <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} />
+            <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} onPrefetch={() => preloadView[item.id]()} />
           ))}
         </ul>
 
@@ -137,12 +138,14 @@ function SectionLabel({ children, className = '' }: { children: React.ReactNode;
   )
 }
 
-function NavItem({ item, active, onClick }: { item: { label: string; icon: React.FC<any>; badge?: string }; active: boolean; onClick: () => void }) {
+function NavItem({ item, active, onClick, onPrefetch }: { item: { label: string; icon: React.FC<any>; badge?: string }; active: boolean; onClick: () => void; onPrefetch?: () => void }) {
   const Icon = item.icon
   return (
     <li>
       <button
         onClick={onClick}
+        onMouseEnter={onPrefetch}
+        onFocus={onPrefetch}
         className={[
           'group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500/30',
           active ? 'text-brand-400' : 'text-text-secondary hover:bg-white/[0.03] hover:text-text-primary',
