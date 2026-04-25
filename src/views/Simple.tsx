@@ -133,9 +133,123 @@ export function Transactions() {
 }
 
 export function Reports() {
+  const { team, activity, toast } = useApp()
+
+  const downloadCsv = (filename: string, rows: (string | number)[][]) => {
+    const escape = (v: string) => /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v
+    const csv = rows.map((r) => r.map((c) => escape(String(c))).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    toast(`${filename} downloaded`, 'green')
+  }
+
+  const reports = [
+    ...team.map((m) => ({
+      id: `1099-${m.id}`,
+      name: `1099-NEC · ${m.name || 'Unnamed'}`,
+      kind: '1099-NEC',
+      period: 'Tax year 2026 · YTD',
+      ready: true as const,
+      onDownload: () => downloadCsv(
+        `1099-${(m.name || 'unnamed').replace(/\s+/g, '-').toLowerCase()}-2026.csv`,
+        [
+          ['Form', 'Recipient', 'Country', 'Method', 'YTD Payments (USD)', 'Tax year'],
+          ['1099-NEC', m.name || 'Unnamed', m.country, m.method, (m.amount * 4).toFixed(2), 2026],
+        ],
+      ),
+    })),
+    {
+      id: 'pl-q1',
+      name: 'Q1 2026 · P&L summary',
+      kind: 'P&L',
+      period: 'Jan 1 – Mar 31, 2026',
+      ready: true as const,
+      onDownload: () => {
+        const inSum = activity.filter((t) => t.amount > 0).reduce((s, t) => s + t.amount, 0)
+        const outSum = activity.filter((t) => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0)
+        const yieldSum = activity.filter((t) => t.type === 'Yield').reduce((s, t) => s + t.amount, 0)
+        downloadCsv('zeno-pl-q1-2026.csv', [
+          ['Metric', 'Value (USD)'],
+          ['Total inflows', inSum.toFixed(2)],
+          ['Total outflows', outSum.toFixed(2)],
+          ['Treasury yield', yieldSum.toFixed(2)],
+          ['Net', (inSum - outSum).toFixed(2)],
+        ])
+      },
+    },
+    {
+      id: 'treasury-stmt',
+      name: 'Treasury statement · April',
+      kind: 'Statement',
+      period: 'Apr 1 – Apr 30, 2026',
+      ready: true as const,
+      onDownload: () => downloadCsv('zeno-treasury-apr-2026.csv', [
+        ['Date', 'Type', 'Detail', 'Amount (USD)'],
+        ...activity.map((t) => [t.date, t.type, t.detail, t.amount.toFixed(2)]),
+      ]),
+    },
+    {
+      id: 'country-tax-br',
+      name: 'Brazil · contractor tax filing',
+      kind: 'Country form',
+      period: 'Q1 2026',
+      ready: false as const,
+      onDownload: () => toast('Brazil filing — generating in background, ETA 30s'),
+    },
+    {
+      id: 'country-tax-in',
+      name: 'India · contractor tax filing',
+      kind: 'Country form',
+      period: 'Q1 2026',
+      ready: false as const,
+      onDownload: () => toast('India filing — generating in background, ETA 30s'),
+    },
+  ]
+
   return (
     <Section title="Reports">
-      <ComingSoon title="Reports" desc="1099s, country tax forms, month-end P&L exports — all auto-generated from your payroll runs." />
+      <Card className="overflow-hidden">
+        <div className="grid grid-cols-[2fr_1fr_1fr_120px] border-b border-border-subtle bg-white/[0.015] px-6 py-3 text-[10.5px] font-medium uppercase tracking-[0.1em] text-text-muted">
+          <div>Report</div>
+          <div>Type</div>
+          <div>Period</div>
+          <div className="text-right">Status</div>
+        </div>
+        <ul>
+          {reports.map((r) => (
+            <li key={r.id} className="grid grid-cols-[2fr_1fr_1fr_120px] items-center border-b border-border-subtle px-6 py-3 last:border-b-0">
+              <div className="text-[13.5px] font-medium text-text-primary">{r.name}</div>
+              <div className="text-[12.5px] text-text-secondary">{r.kind}</div>
+              <div className="text-[12.5px] text-text-muted">{r.period}</div>
+              <div className="flex items-center justify-end">
+                {r.ready ? (
+                  <Button variant="secondary" size="sm" onClick={r.onDownload}>
+                    <IconDownload width={12} height={12} /> CSV
+                  </Button>
+                ) : (
+                  <button
+                    onClick={r.onDownload}
+                    className="rounded-md border border-border-subtle bg-transparent px-2.5 py-1 text-[11.5px] text-text-muted hover:border-amber-500/40 hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+                  >
+                    Generating…
+                  </button>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Card>
+
+      <p className="mt-5 text-center text-[12px] text-text-muted">
+        Reports are auto-generated from payroll activity. Country forms (BR, IN) ship next.
+      </p>
     </Section>
   )
 }
