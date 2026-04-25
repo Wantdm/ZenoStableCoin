@@ -4,6 +4,7 @@ import { Card, Pill, LiveDot, Button, CountUpNumber } from '../components/UI'
 import { treasury, recentActivity } from '../data'
 import { IconTrendUp, IconArrowRight, IconPlus, IconRefresh, IconSpinner } from '../components/Icons'
 import { useApp } from '../context/AppContext'
+import { TopBar } from '../components/TopBar'
 
 export function Treasury() {
   const { goToPayroll, toast } = useApp()
@@ -63,15 +64,12 @@ export function Treasury() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-border-subtle px-8 py-4 pr-40">
-        <h1 className="text-[18px] font-semibold">Treasury</h1>
-        <div className="flex items-center gap-3">
-          <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
-          <Button variant="secondary" onClick={() => toast('Withdraw flow coming soon')}>Withdraw</Button>
-          <Button variant="secondary" onClick={() => toast('Deposit address copied (demo)', 'green')}><IconPlus width={14} height={14} /> Deposit</Button>
-          <Button variant="primary" onClick={goToPayroll}>Run payroll</Button>
-        </div>
-      </div>
+      <TopBar title="Treasury">
+        <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
+        <Button variant="secondary" onClick={() => toast('Withdraw flow coming soon')}>Withdraw</Button>
+        <Button variant="secondary" onClick={() => toast('Deposit address copied (demo)', 'green')}><IconPlus width={14} height={14} /> Deposit</Button>
+        <Button variant="primary" onClick={goToPayroll}>Run payroll</Button>
+      </TopBar>
 
       <div className="flex-1 overflow-auto px-8 py-7">
         <div className="grid grid-cols-3 gap-4">
@@ -84,8 +82,11 @@ export function Treasury() {
                 transition={{ duration: 0.7 }}
                 className="font-mono text-[40px] font-semibold tabular-nums tracking-tight"
               >
-                ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ${Math.round(balance).toLocaleString()}
               </motion.span>
+              <span className="font-mono text-[16px] text-text-muted">
+                .{(Math.abs(balance) % 1).toFixed(2).slice(2)}
+              </span>
               <span className="text-[13px] text-text-secondary">USD</span>
             </div>
             <div className="mt-1 flex items-center gap-2 text-[12.5px] text-brand-400">

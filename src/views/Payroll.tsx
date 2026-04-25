@@ -5,6 +5,7 @@ import { Button, Card, Pill, LiveDot, Avatar, CountryBadge, MethodBadge } from '
 import { IconPlus, IconCheck, IconArrowRight, IconBolt, IconX, IconSpinner, IconChevronDown } from '../components/Icons'
 import { useApp } from '../context/AppContext'
 import { Member, Method } from '../data'
+import { TopBar } from '../components/TopBar'
 
 const steps = ['Set amounts', 'Review & confirm', 'Execute'] as const
 
@@ -20,15 +21,12 @@ export function Payroll() {
   const { payrollStep, setPayrollStep, goToPayroll } = useApp()
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-border-subtle px-8 py-4 pr-40">
-        <h1 className="text-[18px] font-semibold">Run Payroll</h1>
-        <div className="flex items-center gap-3">
-          <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
-          <Button variant="primary" onClick={goToPayroll}>
-            <IconPlus width={14} height={14} /> Run payroll
-          </Button>
-        </div>
-      </div>
+      <TopBar title="Run Payroll">
+        <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
+        <Button variant="primary" onClick={goToPayroll}>
+          <IconPlus width={14} height={14} /> Run payroll
+        </Button>
+      </TopBar>
 
       <div className="border-b border-border-subtle px-8 pt-7">
         <div className="grid grid-cols-3">
@@ -85,10 +83,12 @@ export function Payroll() {
 function StepAmounts({ onNext }: { onNext: () => void }) {
   const { team, setAmount, addMember, removeMember, toast } = useApp()
   const total = useMemo(() => team.reduce((s, m) => s + (Number(m.amount) || 0), 0), [team])
+  const [freshIds, setFreshIds] = useState<Set<string>>(new Set())
 
   const handleAdd = () => {
-    addMember({})
-    toast('New member added')
+    const id = addMember({})
+    setFreshIds((s) => new Set(s).add(id))
+    toast('New member added — fill in details')
   }
 
   const handleCSV = () => {
@@ -119,8 +119,26 @@ function StepAmounts({ onNext }: { onNext: () => void }) {
         </div>
         <ul>
           <AnimatePresence initial={false}>
+            {team.length === 0 && (
+              <motion.li
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="px-6 py-12 text-center"
+              >
+                <div className="text-[14px] font-medium text-text-secondary">No recipients yet</div>
+                <div className="mt-1 text-[12.5px] text-text-muted">Add a member or import a CSV to start.</div>
+              </motion.li>
+            )}
             {team.map((m) => (
-              <MemberRow key={m.id} m={m} setAmount={setAmount} removeMember={removeMember} />
+              <MemberRow
+                key={m.id}
+                m={m}
+                isFresh={freshIds.has(m.id)}
+                setAmount={setAmount}
+                removeMember={removeMember}
+              />
             ))}
           </AnimatePresence>
         </ul>
@@ -151,29 +169,19 @@ function StepAmounts({ onNext }: { onNext: () => void }) {
   )
 }
 
-function MemberRow({ m, setAmount, removeMember }: { m: Member; setAmount: (id: string, v: number) => void; removeMember: (id: string) => void }) {
-  const { addMember } = useApp()
-  const [name, setName] = useState(m.name)
-  const [country, setCountry] = useState({ code: m.countryCode, name: m.country })
-  const [method, setMethod] = useState<Method>(m.method)
+function MemberRow({ m, isFresh, setAmount, removeMember }: { m: Member; isFresh: boolean; setAmount: (id: string, v: number) => void; removeMember: (id: string) => void }) {
+  const { updateMember } = useApp()
   const [countryOpen, setCountryOpen] = useState(false)
   const [methodOpen, setMethodOpen] = useState(false)
-  const isNew = !m.name
 
-  // When new row edits name/country, update the member in context
-  const updateName = (v: string) => {
-    setName(v)
-    // Update initials through remove+add for simplicity; here we persist via addMember? Skip — data is for display only.
-  }
   const pickCountry = (c: { code: string; name: string }) => {
-    setCountry(c)
+    updateMember(m.id, { country: c.name, countryCode: c.code })
     setCountryOpen(false)
   }
   const pickMethod = (mm: Method) => {
-    setMethod(mm)
+    updateMember(m.id, { method: mm })
     setMethodOpen(false)
   }
-  void addMember
 
   return (
     <motion.li
@@ -185,18 +193,19 @@ function MemberRow({ m, setAmount, removeMember }: { m: Member; setAmount: (id: 
       className="group grid grid-cols-[1.6fr_1.1fr_0.8fr_1fr_1fr_40px] items-center border-b border-border-subtle px-6 py-3.5 last:border-b-0"
     >
       <div className="flex items-center gap-3">
-        <Avatar initials={name ? name.split(' ').map((s) => s[0]).join('').slice(0, 2).toUpperCase() : '??'} color={m.avatarColor} />
+        <Avatar initials={m.initials} color={m.avatarColor} />
         <div className="min-w-0">
-          {isNew ? (
+          {isFresh ? (
             <input
               autoFocus
-              value={name}
-              onChange={(e) => updateName(e.target.value)}
+              value={m.name}
+              onChange={(e) => updateMember(m.id, { name: e.target.value })}
               placeholder="Full name"
-              className="h-7 w-full rounded-md border border-border bg-bg-elevated px-2 text-[13px] text-text-primary outline-none focus:border-brand-500"
+              aria-label="Member name"
+              className="h-7 w-full rounded-md border border-border bg-bg-elevated px-2 text-[13px] text-text-primary outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
             />
           ) : (
-            <div className="text-[13.5px] font-medium text-text-primary">{m.name}</div>
+            <div className="text-[13.5px] font-medium text-text-primary">{m.name || 'Unnamed'}</div>
           )}
           <div className="text-[12px] text-text-muted">{m.role}</div>
         </div>
@@ -204,14 +213,15 @@ function MemberRow({ m, setAmount, removeMember }: { m: Member; setAmount: (id: 
 
       {/* Country */}
       <div className="relative">
-        {isNew ? (
+        {isFresh ? (
           <>
             <button
               onClick={() => setCountryOpen((v) => !v)}
-              className="inline-flex items-center gap-2 rounded-md border border-border-subtle bg-bg-elevated px-2 py-1.5 text-[12.5px] text-text-primary hover:border-border"
+              className="inline-flex items-center gap-2 rounded-md border border-border-subtle bg-bg-elevated px-2 py-1.5 text-[12.5px] text-text-primary hover:border-border focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+              aria-label="Choose country"
             >
-              <span className="rounded-sm bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10.5px] text-text-secondary">{country.code}</span>
-              {country.name}
+              <span className="rounded-sm bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10.5px] text-text-secondary">{m.countryCode}</span>
+              {m.country}
               <IconChevronDown width={12} height={12} className="text-text-muted" />
             </button>
             <AnimatePresence>
@@ -244,13 +254,14 @@ function MemberRow({ m, setAmount, removeMember }: { m: Member; setAmount: (id: 
 
       {/* Method */}
       <div className="relative">
-        {isNew ? (
+        {isFresh ? (
           <>
             <button
               onClick={() => setMethodOpen((v) => !v)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border-subtle bg-bg-elevated px-2 py-1 text-[12px] hover:border-border"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border-subtle bg-bg-elevated px-2 py-1 text-[12px] hover:border-border focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+              aria-label="Choose payment method"
             >
-              <MethodBadge method={method} />
+              <MethodBadge method={m.method} />
               <IconChevronDown width={12} height={12} className="text-text-muted" />
             </button>
             <AnimatePresence>
@@ -286,16 +297,18 @@ function MemberRow({ m, setAmount, removeMember }: { m: Member; setAmount: (id: 
           value={m.amount || ''}
           onChange={(e) => setAmount(m.id, Math.max(0, Math.min(1_000_000, Number(e.target.value) || 0)))}
           placeholder="0"
+          aria-label={`Amount for ${m.name || 'new member'}`}
           className="h-9 w-32 rounded-lg border border-border bg-bg-elevated px-3 font-mono text-[13px] text-text-primary outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
         />
       </div>
       <div className="font-mono text-[13px] text-brand-400">
-        ≈ {(m.amount || 0).toLocaleString()} {method === 'EUR Bank' ? 'EUR' : method}
+        ≈ {(m.amount || 0).toLocaleString()} {m.method === 'EUR Bank' ? 'EUR' : m.method}
       </div>
       <div className="text-right">
         <button
           onClick={() => removeMember(m.id)}
           className="inline-flex h-7 w-7 items-center justify-center rounded-md text-text-muted opacity-0 transition-opacity hover:bg-rose-500/10 hover:text-rose-400 group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-500/40 focus:opacity-100"
+          aria-label={`Remove ${m.name || 'member'}`}
           title="Remove"
         >
           <IconX width={14} height={14} />
@@ -486,7 +499,9 @@ function StepExecute() {
   }, [])
 
   const screenFrac = Math.min(1, elapsedMs / TOTAL_DURATION_MS)
-  const tSeconds = Math.min(REAL_TIME_END, Math.floor(screenFrac * REAL_TIME_END))
+  const tSeconds = done
+    ? REAL_TIME_END
+    : Math.min(REAL_TIME_END - 1, Math.floor(screenFrac * REAL_TIME_END))
   const currentStage = stages.slice().reverse().find((s) => tSeconds >= s.t) ?? stages[0]
 
   const onReset = () => {

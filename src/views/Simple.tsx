@@ -3,6 +3,7 @@ import { recentActivity } from '../data'
 import { useApp } from '../context/AppContext'
 import { IconPlus, IconDownload } from '../components/Icons'
 import { motion } from 'framer-motion'
+import { TopBar } from '../components/TopBar'
 
 export function Team() {
   const { team, toast, goToPayroll } = useApp()
@@ -122,13 +123,10 @@ export function Settings() {
 function Section({ title, children, actions }: { title: string; children: React.ReactNode; actions?: React.ReactNode }) {
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-border-subtle px-8 py-4 pr-40">
-        <h1 className="text-[18px] font-semibold">{title}</h1>
-        <div className="flex items-center gap-3">
-          <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
-          {actions}
-        </div>
-      </div>
+      <TopBar title={title}>
+        <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
+        {actions}
+      </TopBar>
       <div className="flex-1 overflow-auto px-8 py-7">{children}</div>
     </div>
   )

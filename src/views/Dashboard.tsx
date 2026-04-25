@@ -2,21 +2,19 @@ import { Card, Pill, LiveDot, Button, Avatar, MethodBadge, CountUpNumber } from 
 import { treasury, recentActivity } from '../data'
 import { IconTrendUp, IconArrowRight, IconBolt } from '../components/Icons'
 import { useApp } from '../context/AppContext'
+import { TopBar } from '../components/TopBar'
 
 export function Dashboard() {
   const { team, setView, goToPayroll } = useApp()
   const monthly = team.reduce((s, m) => s + m.amount, 0)
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-border-subtle px-8 py-4 pr-40">
-        <h1 className="text-[18px] font-semibold">Dashboard</h1>
-        <div className="flex items-center gap-3">
-          <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
-          <Button variant="primary" onClick={goToPayroll}>
-            <IconBolt width={14} height={14} /> Run payroll
-          </Button>
-        </div>
-      </div>
+      <TopBar title="Dashboard">
+        <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
+        <Button variant="primary" onClick={goToPayroll}>
+          <IconBolt width={14} height={14} /> Run payroll
+        </Button>
+      </TopBar>
 
       <div className="flex-1 overflow-auto px-8 py-7">
         <div className="grid grid-cols-4 gap-4">

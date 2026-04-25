@@ -7,11 +7,9 @@ import { Dashboard } from './views/Dashboard'
 import { Payroll } from './views/Payroll'
 import { Treasury } from './views/Treasury'
 import { Team, Transactions, Reports, Settings } from './views/Simple'
-import { Button } from './components/UI'
-import { IconRotate } from './components/Icons'
 
 function Shell() {
-  const { route, view, resetDemo } = useApp()
+  const { route, view } = useApp()
 
   return (
     <AnimatePresence mode="wait">
@@ -54,15 +52,6 @@ function Shell() {
                 {view === 'settings' && <Settings />}
               </motion.div>
             </AnimatePresence>
-
-            <button
-              onClick={resetDemo}
-              className="group absolute right-5 top-5 z-40 flex items-center gap-1.5 rounded-lg border border-border-subtle bg-bg-elevated/80 px-2.5 py-1.5 text-[11.5px] text-text-secondary backdrop-blur transition-colors hover:border-brand-500/40 hover:text-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-              title="Reset demo state"
-            >
-              <IconRotate width={12} height={12} className="transition-transform group-hover:-rotate-90" />
-              Reset demo
-            </button>
           </main>
         </motion.div>
       )}
