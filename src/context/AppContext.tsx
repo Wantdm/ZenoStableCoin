@@ -120,22 +120,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    const onPop = () => {
+    const onPop = (e: PopStateEvent) => {
       setRoute(window.location.pathname.startsWith('/app') ? 'app' : 'landing')
+      const v = e.state?.view as View | undefined
+      if (v) setViewInner(v)
     }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [])
 
   const setView = useCallback((v: View) => {
-    setViewInner(v)
+    setViewInner((prev) => {
+      if (prev !== v) {
+        window.history.pushState({ route: 'app', view: v }, '', '/app')
+      }
+      return v
+    })
   }, [])
 
   const goToPayroll = useCallback(() => {
-    setViewInner('payroll')
+    setView('payroll')
     setPayrollStep(0)
     setAuthorized(false)
-  }, [])
+  }, [setView])
 
   const setAmount = useCallback((id: string, amount: number) => {
     setTeam((t) => t.map((m) => (m.id === id ? { ...m, amount } : m)))
@@ -180,6 +187,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     balanceTargetRef.current = Math.max(0, balanceTargetRef.current + tx.amount)
     setTreasuryBalance((b) => Math.max(0, b + tx.amount))
   }, [])
+
+  // Live yield event every ~70s — adds a new "Yield · accrued" entry so the
+  // activity feed feels alive during the demo, not just during a payroll.
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      const amt = Math.round(20 + Math.random() * 60)
+      addTransaction({
+        type: 'Yield',
+        detail: 'T-bill token yield · accrued',
+        amount: amt,
+        date: 'Today',
+      })
+    }, 70000)
+    return () => clearInterval(id)
+  }, [addTransaction])
 
   const toast = useCallback((msg: string, tone: 'neutral' | 'green' = 'neutral') => {
     const id = Date.now() + Math.random()
