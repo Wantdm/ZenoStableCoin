@@ -28,13 +28,20 @@ const countries: { code: string; name: string }[] = [
 ]
 
 export function Payroll() {
-  const { payrollStep, setPayrollStep, goToPayroll } = useApp()
+  const { payrollStep, setPayrollStep, goToPayroll, isExecuting, toast } = useApp()
+  const restart = () => {
+    if (isExecuting) {
+      toast('Wait for payroll to finish before restarting')
+      return
+    }
+    goToPayroll()
+  }
   return (
     <div className="flex h-full flex-col">
       <TopBar title="Run Payroll">
         <Pill tone="green" className="h-7 px-2.5"><LiveDot /> Live · USDC/USDT</Pill>
-        <Button variant="primary" onClick={goToPayroll}>
-          <IconPlus width={14} height={14} /> Run payroll
+        <Button variant="primary" onClick={restart} disabled={isExecuting} title={isExecuting ? 'Wait for payroll to finish' : 'Restart from step 1'}>
+          <IconPlus width={14} height={14} /> {payrollStep === 0 ? 'Run payroll' : 'Restart'}
         </Button>
       </TopBar>
 
