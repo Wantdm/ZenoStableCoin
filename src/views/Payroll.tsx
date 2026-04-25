@@ -14,7 +14,17 @@ const countries: { code: string; name: string }[] = [
   { code: 'GB', name: 'United Kingdom' },
   { code: 'CA', name: 'Canada' },
   { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
   { code: 'JP', name: 'Japan' },
+  { code: 'KR', name: 'South Korea' },
+  { code: 'IN', name: 'India' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'AR', name: 'Argentina' },
+  { code: 'NG', name: 'Nigeria' },
+  { code: 'GH', name: 'Ghana' },
+  { code: 'PH', name: 'Philippines' },
+  { code: 'ID', name: 'Indonesia' },
 ]
 
 export function Payroll() {
@@ -99,7 +109,12 @@ function StepAmounts({ onNext }: { onNext: () => void }) {
   }
 
   const handleCSV = () => {
-    csvSeed.forEach((m) => addMember(m))
+    const ids = csvSeed.map((m) => addMember(m))
+    setFreshIds((s) => {
+      const next = new Set(s)
+      ids.forEach((id) => next.add(id))
+      return next
+    })
     toast(`Imported ${csvSeed.length} contractors from sample CSV`, 'green')
   }
 
@@ -257,7 +272,7 @@ function MemberRow({ m, isFresh, setAmount, removeMember }: { m: Member; isFresh
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 4 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute left-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-lg border border-border-subtle bg-bg-elevated shadow-xl"
+                  className="absolute left-0 top-full z-20 mt-1 max-h-64 w-48 overflow-y-auto rounded-lg border border-border-subtle bg-bg-elevated shadow-xl"
                 >
                   {countries.map((c) => (
                     <button
