@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useCountUp, useInView } from '../hooks/useCountUp'
 
 export function Pill({
@@ -26,13 +26,16 @@ export function Pill({
 }
 
 export function LiveDot() {
+  const reduce = useReducedMotion()
   return (
     <span className="relative flex h-2 w-2">
-      <motion.span
-        className="absolute inline-flex h-full w-full rounded-full bg-brand-500"
-        animate={{ opacity: [0.55, 1, 0.55], scale: [1, 1.15, 1] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-      />
+      {!reduce && (
+        <motion.span
+          className="absolute inline-flex h-full w-full rounded-full bg-brand-500"
+          animate={{ opacity: [0.55, 1, 0.55], scale: [1, 1.15, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      )}
       <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
     </span>
   )
