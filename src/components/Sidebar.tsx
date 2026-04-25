@@ -18,9 +18,10 @@ const financeNav: { id: View; label: string; icon: React.FC<any> }[] = [
 ]
 
 export function Sidebar() {
-  const { view, setView, navigate, toast } = useApp()
+  const { view, setView, navigate, toast, setPaletteOpen } = useApp()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform)
 
   useEffect(() => {
     if (!menuOpen) return
@@ -62,6 +63,24 @@ export function Sidebar() {
             <NavItem key={item.id} item={item} active={view === item.id} onClick={() => setView(item.id)} />
           ))}
         </ul>
+
+        <button
+          onClick={() => setPaletteOpen(true)}
+          className="mt-5 flex w-full items-center justify-between rounded-lg border border-border-subtle bg-transparent px-3 py-2 text-[12px] text-text-muted transition-colors hover:border-brand-500/40 hover:bg-white/[0.02] hover:text-text-secondary focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+          title="Command palette"
+        >
+          <span className="flex items-center gap-2">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            Search…
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="rounded border border-border-subtle bg-white/[0.04] px-1 py-px font-mono text-[9.5px]">{isMac ? '⌘' : 'Ctrl'}</kbd>
+            <kbd className="rounded border border-border-subtle bg-white/[0.04] px-1 py-px font-mono text-[9.5px]">K</kbd>
+          </span>
+        </button>
       </nav>
 
       <div className="relative p-3" ref={menuRef}>

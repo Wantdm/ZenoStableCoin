@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { AppProvider, useApp } from './context/AppContext'
 import { Sidebar } from './components/Sidebar'
 import { ToastHost } from './components/Toast'
+import { CommandPalette } from './components/CommandPalette'
 import { Landing } from './views/Landing'
 import { Dashboard } from './views/Dashboard'
 import { Payroll } from './views/Payroll'
@@ -63,6 +64,7 @@ export default function App() {
   return (
     <AppProvider>
       <Shell />
+      <CommandPalette />
       <ToastHost />
     </AppProvider>
   )

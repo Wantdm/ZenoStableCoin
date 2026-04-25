@@ -42,6 +42,9 @@ type Ctx = {
   toast: (msg: string, tone?: 'neutral' | 'green') => void
   dismissToast: (id: number) => void
 
+  paletteOpen: boolean
+  setPaletteOpen: (v: boolean) => void
+
   resetDemo: () => void
 }
 
@@ -78,6 +81,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [treasuryBalance, setTreasuryBalance] = useState(seedTreasury.balance)
   const [treasuryYieldMtd, setTreasuryYieldMtd] = useState(seedTreasury.yieldMtd)
   const [activity, setActivity] = useState<Activity[]>(seedActivity as Activity[])
+  const [paletteOpen, setPaletteOpen] = useState(false)
   const balanceTargetRef = useRef(seedTreasury.balance)
 
   useEffect(() => {
@@ -245,8 +249,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     payrollStep, setPayrollStep, authorized, setAuthorized, isExecuting,
     treasuryBalance, treasuryYieldMtd, activity, addTransaction,
     toasts, toast, dismissToast,
+    paletteOpen, setPaletteOpen,
     resetDemo,
-  }), [route, navigate, view, setView, goToPayroll, team, setAmount, addMember, updateMember, removeMember, payrollStep, authorized, isExecuting, treasuryBalance, treasuryYieldMtd, activity, addTransaction, toasts, toast, dismissToast, resetDemo])
+  }), [route, navigate, view, setView, goToPayroll, team, setAmount, addMember, updateMember, removeMember, payrollStep, authorized, isExecuting, treasuryBalance, treasuryYieldMtd, activity, addTransaction, toasts, toast, dismissToast, paletteOpen, resetDemo])
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>
 }
