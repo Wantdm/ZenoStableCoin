@@ -180,7 +180,7 @@ export function Landing() {
             <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-brand-400">About</div>
             <h2 className="mt-3 text-[32px] font-semibold tracking-tight">Built for founders paying contractors in 15 time zones.</h2>
             <p className="mt-3 text-[14px] leading-relaxed text-text-secondary">
-              Traditional payroll was built for full-time W-2 in one country. Zeno is built for the way teams actually work in 2026: mostly remote, mostly 1099, mostly not American.
+              Traditional payroll was built for full-time W-2 in one country. Zeno is built for the way teams actually work in {new Date().getFullYear()}: mostly remote, mostly 1099, mostly not American.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Button variant="primary" onClick={launch}>Launch app <IconArrowRight width={14} height={14} /></Button>
@@ -226,7 +226,7 @@ export function Landing() {
 
       <footer className="border-t border-border-subtle">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 text-[12.5px] text-text-muted">
-          <div className="flex items-center gap-3"><Logo size={22} /><span className="text-text-muted">© 2026 Zeno Labs</span></div>
+          <div className="flex items-center gap-3"><Logo size={22} /><span className="text-text-muted">© {new Date().getFullYear()} Zeno Labs</span></div>
           <div className="flex gap-6">
             {['Privacy', 'Terms', 'Status', 'Contact'].map((l) => (
               <button
