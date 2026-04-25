@@ -15,7 +15,8 @@ export function ToastHost() {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 20, scale: 0.98 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="pointer-events-auto flex items-center gap-2.5 rounded-xl border border-border-subtle bg-bg-elevated px-3.5 py-2.5 text-[13px] shadow-xl backdrop-blur"
+            className="pointer-events-auto group flex items-center gap-2.5 rounded-xl border border-border-subtle bg-bg-elevated px-3.5 py-2.5 text-[13px] shadow-xl backdrop-blur transition-colors hover:border-border hover:bg-bg-surface focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+            title="Click to dismiss"
           >
             <span className={`flex h-5 w-5 items-center justify-center rounded-full ${t.tone === 'green' ? 'bg-brand-500/20 text-brand-400' : 'bg-white/10 text-text-secondary'}`}>
               <IconCheck width={12} height={12} />

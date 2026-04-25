@@ -135,7 +135,7 @@ export function Treasury() {
           <Card className="p-6">
             <div className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted">Yield · this month</div>
             <div className="mt-2 font-mono text-[28px] font-semibold tabular-nums text-brand-400">
-              +<CountUpNumber target={treasury.yieldMtd} decimals={0} durationMs={1200} />
+              +$<CountUpNumber target={treasury.yieldMtd} decimals={0} durationMs={1200} />
             </div>
             <div className="mt-1 text-[12.5px] text-text-secondary">{treasury.apy}% APY · auto-compounded</div>
 

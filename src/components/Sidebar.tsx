@@ -76,7 +76,7 @@ export function Sidebar() {
             >
               <button
                 className="block w-full px-3 py-2.5 text-left text-[13px] text-text-secondary transition-colors hover:bg-white/[0.04] hover:text-text-primary"
-                onClick={() => { setMenuOpen(false); toast('Only one workspace in demo') }}
+                onClick={() => { setMenuOpen(false); toast('Only Acme Corp is set up in this demo') }}
               >
                 Switch workspace
               </button>

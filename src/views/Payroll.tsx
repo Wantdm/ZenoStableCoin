@@ -28,7 +28,7 @@ export function Payroll() {
         </Button>
       </TopBar>
 
-      <div className="border-b border-border-subtle px-8 pt-7">
+      <div className="sticky top-0 z-20 border-b border-border-subtle bg-bg-base/85 px-8 pt-7 backdrop-blur">
         <div className="grid grid-cols-3">
           {steps.map((s, i) => {
             const active = i === payrollStep
@@ -171,16 +171,33 @@ function StepAmounts({ onNext }: { onNext: () => void }) {
 
 function MemberRow({ m, isFresh, setAmount, removeMember }: { m: Member; isFresh: boolean; setAmount: (id: string, v: number) => void; removeMember: (id: string) => void }) {
   const { updateMember } = useApp()
-  const [countryOpen, setCountryOpen] = useState(false)
-  const [methodOpen, setMethodOpen] = useState(false)
+  const [openMenu, setOpenMenu] = useState<'country' | 'method' | null>(null)
+  const countryRef = useRef<HTMLDivElement>(null)
+  const methodRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!openMenu) return
+    const handler = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (openMenu === 'country' && countryRef.current && !countryRef.current.contains(target)) setOpenMenu(null)
+      if (openMenu === 'method' && methodRef.current && !methodRef.current.contains(target)) setOpenMenu(null)
+    }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpenMenu(null) }
+    window.addEventListener('mousedown', handler)
+    window.addEventListener('keydown', esc)
+    return () => {
+      window.removeEventListener('mousedown', handler)
+      window.removeEventListener('keydown', esc)
+    }
+  }, [openMenu])
 
   const pickCountry = (c: { code: string; name: string }) => {
     updateMember(m.id, { country: c.name, countryCode: c.code })
-    setCountryOpen(false)
+    setOpenMenu(null)
   }
   const pickMethod = (mm: Method) => {
     updateMember(m.id, { method: mm })
-    setMethodOpen(false)
+    setOpenMenu(null)
   }
 
   return (
@@ -212,20 +229,21 @@ function MemberRow({ m, isFresh, setAmount, removeMember }: { m: Member; isFresh
       </div>
 
       {/* Country */}
-      <div className="relative">
+      <div className="relative" ref={countryRef}>
         {isFresh ? (
           <>
             <button
-              onClick={() => setCountryOpen((v) => !v)}
+              onClick={() => setOpenMenu((v) => (v === 'country' ? null : 'country'))}
               className="inline-flex items-center gap-2 rounded-md border border-border-subtle bg-bg-elevated px-2 py-1.5 text-[12.5px] text-text-primary hover:border-border focus:outline-none focus:ring-2 focus:ring-brand-500/30"
               aria-label="Choose country"
+              aria-expanded={openMenu === 'country'}
             >
               <span className="rounded-sm bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10.5px] text-text-secondary">{m.countryCode}</span>
               {m.country}
-              <IconChevronDown width={12} height={12} className="text-text-muted" />
+              <IconChevronDown width={12} height={12} className={`text-text-muted transition-transform ${openMenu === 'country' ? 'rotate-180' : ''}`} />
             </button>
             <AnimatePresence>
-              {countryOpen && (
+              {openMenu === 'country' && (
                 <motion.div
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -253,19 +271,20 @@ function MemberRow({ m, isFresh, setAmount, removeMember }: { m: Member; isFresh
       </div>
 
       {/* Method */}
-      <div className="relative">
+      <div className="relative" ref={methodRef}>
         {isFresh ? (
           <>
             <button
-              onClick={() => setMethodOpen((v) => !v)}
+              onClick={() => setOpenMenu((v) => (v === 'method' ? null : 'method'))}
               className="inline-flex items-center gap-1.5 rounded-md border border-border-subtle bg-bg-elevated px-2 py-1 text-[12px] hover:border-border focus:outline-none focus:ring-2 focus:ring-brand-500/30"
               aria-label="Choose payment method"
+              aria-expanded={openMenu === 'method'}
             >
               <MethodBadge method={m.method} />
-              <IconChevronDown width={12} height={12} className="text-text-muted" />
+              <IconChevronDown width={12} height={12} className={`text-text-muted transition-transform ${openMenu === 'method' ? 'rotate-180' : ''}`} />
             </button>
             <AnimatePresence>
-              {methodOpen && (
+              {openMenu === 'method' && (
                 <motion.div
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -438,8 +457,7 @@ const TOTAL_DURATION_MS = 6200 // compressed screen time
 const REAL_TIME_END = 28 // T+28s shown to user
 
 function StepExecute() {
-  const { team, resetDemo, setView } = useApp()
-  const { goToPayroll } = useApp()
+  const { team, setView, goToPayroll } = useApp()
   const total = useMemo(() => team.reduce((s, m) => s + m.amount, 0), [team])
 
   const [elapsedMs, setElapsedMs] = useState(0)
@@ -506,7 +524,6 @@ function StepExecute() {
 
   const onReset = () => {
     clearAll()
-    resetDemo()
     goToPayroll()
   }
 

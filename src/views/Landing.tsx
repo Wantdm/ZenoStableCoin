@@ -46,7 +46,7 @@ export function Landing() {
         <div className="absolute inset-x-0 top-0 h-[520px] glow-radial" />
         <div className="relative mx-auto max-w-6xl px-6 pt-24 pb-20 text-center">
           <Pill tone="green" className="h-7 px-3"><LiveDot /> USDC/USDT mainnet · live</Pill>
-          <h1 className="mx-auto mt-6 max-w-3xl text-[56px] font-semibold leading-[1.04] tracking-[-0.02em]">
+          <h1 className="mx-auto mt-6 max-w-3xl text-[40px] font-semibold leading-[1.04] tracking-[-0.02em] sm:text-[48px] md:text-[56px]">
             Stablecoin payroll for{' '}
             <span className="text-brand-400">global teams.</span>
           </h1>
