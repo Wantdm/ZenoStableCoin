@@ -145,6 +145,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setView = useCallback((v: View) => {
+    setRoute('app')
     setViewInner((prev) => {
       if (prev !== v) {
         window.history.pushState({ route: 'app', view: v }, '', '/app')
@@ -199,7 +200,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addTransaction = useCallback((tx: Omit<Activity, 'id'> & { id?: string }) => {
     const id = tx.id ?? String(Date.now()) + Math.random().toString(36).slice(2, 6)
     const createdAt = tx.createdAt ?? Date.now()
-    setActivity((a) => [{ ...tx, id, createdAt }, ...a])
+    setActivity((a) => [{ ...tx, id, createdAt }, ...a].slice(0, 80))
     balanceTargetRef.current = Math.max(0, balanceTargetRef.current + tx.amount)
     setTreasuryBalance((b) => Math.max(0, b + tx.amount))
   }, [])
