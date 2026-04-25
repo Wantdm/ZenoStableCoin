@@ -59,12 +59,12 @@ export function Landing() {
             Pay global contractors in under 3 minutes at <span className="font-mono text-text-primary">0.2%</span> — versus{' '}
             <span className="font-mono text-text-primary">2–7%</span> and <span className="font-mono text-text-primary">3–5 days</span> with SWIFT.
           </p>
-          <div className="mt-8 flex items-center justify-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Button variant="primary" size="lg" onClick={launch}>Launch app <IconArrowRight width={16} height={16} /></Button>
             <Button variant="secondary" size="lg" onClick={() => scrollTo(howRef)}>Read the blueprint</Button>
           </div>
 
-          <div className="mx-auto mt-14 grid max-w-3xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border-subtle bg-border-subtle">
+          <div className="mx-auto mt-14 grid max-w-3xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border-subtle bg-border-subtle sm:grid-cols-3">
             {[
               ['0.2%', 'Network fee'],
               ['< 3 min', 'Settlement'],
@@ -101,7 +101,7 @@ export function Landing() {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-3 gap-4">
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
           <HowStep n="01" title="Fund your treasury" copy="Wire USD or deposit USDC/USDT. Balance auto-routes to tokenized T-bills earning 4.5% APY." />
           <HowStep n="02" title="Set up your team" copy="Import contractors by CSV or paste from your HR tool. Each picks USDC, USDT, or a local-rail off-ramp." />
           <HowStep n="03" title="Run payroll in 3 min" copy="Zeno redeems the exact amount from treasury, fans it out to recipients globally, and writes receipts." />
@@ -116,7 +116,7 @@ export function Landing() {
           <p className="mt-3 text-[15px] text-text-secondary">Cut the wires. Keep your float earning. Send to anyone, anywhere, in minutes.</p>
         </div>
 
-        <div className="mt-12 grid grid-cols-3 gap-4">
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
           <Feature icon={<IconBolt />} title="3-minute payouts" copy="Stablecoin rails settle in seconds. No bank holidays, no cutoffs, no chasing wires." />
           <Feature icon={<IconGlobe />} title="120+ countries" copy="USDC, USDT, and local-rail off-ramps where contractors want them." />
           <Feature icon={<IconTrendUp />} title="Yield on idle cash" copy="Operating balance auto-routes to tokenized T-bills. Redeem for any payroll run." />
@@ -138,7 +138,7 @@ export function Landing() {
 
       {/* Docs */}
       <section ref={docsRef} className="mx-auto max-w-6xl px-6 py-20">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card className="p-8">
             <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-brand-400">Docs</div>
             <h2 className="mt-3 text-[28px] font-semibold tracking-tight">Drop-in payroll API</h2>
@@ -175,7 +175,7 @@ export function Landing() {
 
       {/* About */}
       <section ref={aboutRef} className="mx-auto max-w-6xl px-6 py-20">
-        <Card className="grid grid-cols-2 gap-10 p-10">
+        <Card className="grid grid-cols-1 gap-10 p-6 md:grid-cols-2 md:p-10">
           <div>
             <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-brand-400">About</div>
             <h2 className="mt-3 text-[32px] font-semibold tracking-tight">Built for founders paying contractors in 15 time zones.</h2>
@@ -216,7 +216,7 @@ export function Landing() {
             <p className="mx-auto mt-3 max-w-xl text-[15px] text-text-secondary">
               No bank wires. No 2–7% fees. No 3–5 day settlement. Just stablecoin rails and a treasury that earns.
             </p>
-            <div className="mt-7 flex items-center justify-center gap-3">
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
               <Button variant="primary" size="lg" onClick={launch}>Launch app <IconArrowRight width={16} height={16} /></Button>
               <Button variant="secondary" size="lg" onClick={() => scrollTo(howRef)}>Read the blueprint</Button>
             </div>
@@ -297,10 +297,10 @@ function Stat({ big, small }: { big: string; small: string }) {
 
 function SavingsCallout({ onEnterApp }: { onEnterApp: () => void }) {
   return (
-    <Card className="relative overflow-hidden p-10">
+    <Card className="relative overflow-hidden p-6 md:p-10">
       <div className="absolute inset-0 glow-radial opacity-40" />
-      <div className="relative grid grid-cols-5 items-center gap-8">
-        <div className="col-span-3">
+      <div className="relative grid grid-cols-1 items-center gap-8 md:grid-cols-5">
+        <div className="md:col-span-3">
           <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-brand-400">What you'd save</div>
           <h2 className="mt-3 text-[32px] font-semibold leading-tight tracking-tight">
             <CountUpNumber target={28800} prefix="$" when="inView" durationMs={1800} className="font-mono text-brand-400" /> per year,{' '}
@@ -313,7 +313,7 @@ function SavingsCallout({ onEnterApp }: { onEnterApp: () => void }) {
             <Button variant="primary" onClick={onEnterApp}>Open the live demo <IconArrowRight width={14} height={14} /></Button>
           </div>
         </div>
-        <div className="col-span-2">
+        <div className="md:col-span-2">
           <Card className="bg-bg-elevated p-5">
             <div className="text-[11.5px] uppercase tracking-[0.1em] text-text-muted">Annual cost (5 contractors)</div>
             <ul className="mt-4 space-y-3">
@@ -380,7 +380,8 @@ function ComparisonTable() {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
 
   return (
-    <Card className="mt-10 overflow-hidden">
+    <Card className="mt-10 overflow-x-auto">
+      <div className="min-w-[640px]">
       <div className="grid grid-cols-5 border-b border-border-subtle bg-white/[0.015] px-6 py-3.5 text-[10.5px] font-medium uppercase tracking-[0.1em] text-text-muted">
         <div>Provider</div>
         <div>Fee</div>
@@ -423,6 +424,7 @@ function ComparisonTable() {
           </motion.div>
         )
       })}
+      </div>
     </Card>
   )
 }
