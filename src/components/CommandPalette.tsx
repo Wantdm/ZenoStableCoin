@@ -6,6 +6,7 @@ type Action = {
   id: string
   label: string
   hint: string
+  shortcut?: string
   run: () => void
 }
 
@@ -17,20 +18,21 @@ export function CommandPalette() {
   const listRef = useRef<HTMLUListElement>(null)
 
   const actions = useMemo<Action[]>(() => {
-    const goView = (v: View, label: string): Action => ({
+    const goView = (v: View, label: string, shortcutKey: string): Action => ({
       id: `go:${v}`,
       label: `Go to ${label}`,
       hint: 'View',
+      shortcut: `g ${shortcutKey}`,
       run: () => setView(v),
     })
     return [
-      goView('dashboard', 'Dashboard'),
-      goView('payroll', 'Payroll'),
-      goView('treasury', 'Treasury'),
-      goView('team', 'Team'),
-      goView('transactions', 'Transactions'),
-      goView('reports', 'Reports'),
-      goView('settings', 'Settings'),
+      goView('dashboard', 'Dashboard', 'd'),
+      goView('payroll', 'Payroll', 'p'),
+      goView('treasury', 'Treasury', 'y'),
+      goView('team', 'Team', 't'),
+      goView('transactions', 'Transactions', 'x'),
+      goView('reports', 'Reports', 'r'),
+      goView('settings', 'Settings', 's'),
       { id: 'run', label: 'Run new payroll', hint: 'Action', run: () => goToPayroll() },
       {
         id: 'reset',
@@ -185,7 +187,12 @@ export function CommandPalette() {
                       </span>
                       {a.label}
                     </span>
-                    <span className="font-mono text-[10.5px] uppercase tracking-wider text-text-muted">{a.hint}</span>
+                    <span className="flex items-center gap-2">
+                      {a.shortcut && (
+                        <span className="hidden font-mono text-[10.5px] text-text-muted sm:inline">{a.shortcut}</span>
+                      )}
+                      <span className="font-mono text-[10.5px] uppercase tracking-wider text-text-muted">{a.hint}</span>
+                    </span>
                   </li>
                 )
               })}
