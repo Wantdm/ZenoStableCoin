@@ -177,7 +177,8 @@ export function Landing() {
 
       {/* About */}
       <section ref={aboutRef} className="mx-auto max-w-6xl px-6 py-20">
-        <Card className="grid grid-cols-1 gap-10 p-6 md:grid-cols-2 md:p-10">
+        <Card className="p-6 md:p-10">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
           <div>
             <div className="text-[12px] font-medium uppercase tracking-[0.16em] text-brand-400">About</div>
             <h2 className="mt-3 text-[32px] font-semibold tracking-tight">Built for founders paying contractors in 15 time zones.</h2>
@@ -205,6 +206,29 @@ export function Landing() {
             <Stat big="0.2%" small="Flat fee" />
             <Stat big="120+" small="Countries" />
             <Stat big="4.5%" small="Treasury APY" />
+          </div>
+          </div>
+
+          <div className="mt-10 border-t border-border-subtle pt-8">
+            <div className="text-[11.5px] font-medium uppercase tracking-[0.16em] text-text-muted">Founding team</div>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { name: 'Arpan Ghoshal', role: 'CEO', initials: 'AG', color: 'bg-emerald-600' },
+                { name: 'Darya Saadat', role: 'CMO', initials: 'DS', color: 'bg-sky-600' },
+                { name: 'Stanley Yang', role: 'CTO', initials: 'SY', color: 'bg-violet-600' },
+                { name: 'Jacob Wang', role: 'CFO', initials: 'JW', color: 'bg-amber-600' },
+              ].map((p) => (
+                <div key={p.name} className="flex items-center gap-3 rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2.5">
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold text-white ${p.color}`}>
+                    {p.initials}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-[13px] font-medium text-text-primary">{p.name}</div>
+                    <div className="text-[11px] uppercase tracking-wider text-text-muted">{p.role}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </Card>
       </section>
