@@ -31,7 +31,7 @@ export function Payroll() {
   const { payrollStep, setPayrollStep, goToPayroll, isExecuting, toast } = useApp()
   const restart = () => {
     if (isExecuting) {
-      toast('Wait for payroll to finish before restarting')
+      toast('Wait for payroll to finish before restarting', 'amber')
       return
     }
     goToPayroll()

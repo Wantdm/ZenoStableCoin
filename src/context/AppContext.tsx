@@ -6,7 +6,7 @@ export type { Activity } from '../data'
 export type View = 'dashboard' | 'payroll' | 'treasury' | 'team' | 'transactions' | 'reports' | 'settings'
 export type Route = 'landing' | 'app'
 
-type Toast = { id: number; msg: string; tone?: 'neutral' | 'green' }
+type Toast = { id: number; msg: string; tone?: 'neutral' | 'green' | 'amber' }
 
 export function formatActivityDate(a: Activity, now: number = Date.now()): string {
   if (!a.createdAt) return a.date
@@ -43,7 +43,7 @@ type Ctx = {
   addTransaction: (tx: Omit<Activity, 'id'> & { id?: string }) => void
 
   toasts: Toast[]
-  toast: (msg: string, tone?: 'neutral' | 'green') => void
+  toast: (msg: string, tone?: 'neutral' | 'green' | 'amber') => void
   dismissToast: (id: number) => void
 
   paletteOpen: boolean
@@ -231,7 +231,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(id)
   }, [addTransaction])
 
-  const toast = useCallback((msg: string, tone: 'neutral' | 'green' = 'neutral') => {
+  const toast = useCallback((msg: string, tone: 'neutral' | 'green' | 'amber' = 'neutral') => {
     const id = Date.now() + Math.random()
     setToasts((ts) => [...ts, { id, msg, tone }])
     window.setTimeout(() => {

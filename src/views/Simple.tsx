@@ -285,7 +285,7 @@ export function Settings() {
 
   const armReset = () => {
     if (isExecuting) {
-      toast('Wait for payroll to finish before resetting')
+      toast('Wait for payroll to finish before resetting', 'amber')
       return
     }
     setArmed(true)

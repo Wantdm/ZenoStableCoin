@@ -40,7 +40,7 @@ export function CommandPalette() {
         hint: 'Action',
         run: () => {
           if (isExecuting) {
-            toast('Wait for payroll to finish before resetting')
+            toast('Wait for payroll to finish before resetting', 'amber')
             return
           }
           resetDemo()

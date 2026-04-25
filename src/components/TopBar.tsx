@@ -16,7 +16,7 @@ export function TopBar({ title, children }: { title: string; children?: ReactNod
 
   const arm = () => {
     if (isExecuting) {
-      toast('Wait for payroll to finish before resetting')
+      toast('Wait for payroll to finish before resetting', 'amber')
       return
     }
     setArmed(true)

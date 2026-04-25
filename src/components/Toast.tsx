@@ -28,6 +28,14 @@ export function ToastHost() {
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-500/20 text-brand-400">
                 <IconCheck width={12} height={12} />
               </span>
+            ) : t.tone === 'amber' ? (
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/20 text-amber-400">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 9v4" />
+                  <path d="M12 17h.01" />
+                  <circle cx="12" cy="12" r="9" />
+                </svg>
+              </span>
             ) : (
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.06] text-text-muted">
                 <span className="h-1.5 w-1.5 rounded-full bg-text-muted" />
