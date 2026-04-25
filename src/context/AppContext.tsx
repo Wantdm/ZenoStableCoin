@@ -144,6 +144,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('popstate', onPop)
   }, [])
 
+  useEffect(() => {
+    const baseTitle = 'Zeno — Stablecoin payroll for global teams'
+    if (route === 'landing') {
+      document.title = baseTitle
+      return
+    }
+    const labels: Record<View, string> = {
+      dashboard: 'Dashboard',
+      payroll: 'Payroll',
+      treasury: 'Treasury',
+      team: 'Team',
+      transactions: 'Transactions',
+      reports: 'Reports',
+      settings: 'Settings',
+    }
+    document.title = `Zeno · ${labels[view]}`
+  }, [route, view])
+
   const setView = useCallback((v: View) => {
     setRoute('app')
     setViewInner((prev) => {
